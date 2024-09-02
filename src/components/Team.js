@@ -85,10 +85,14 @@ const Team = ({ account, web3, contract }) => {
     return 0;
   };
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(inviteLink).then(() => {
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(inviteLink);
       alert('Invite link copied to clipboard');
-    });
+    } catch (error) {
+      console.error('Failed to copy invite link:', error);
+      alert('Failed to copy invite link. Please try again.');
+    }
   };
 
   return (
