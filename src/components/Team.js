@@ -88,12 +88,30 @@ const Team = ({ account, web3, contract }) => {
 
   const handleCopy = async () => {
     try {
+      // 尝试使用现代的 clipboard API
       await navigator.clipboard.writeText(inviteLink);
       setCopySuccess('Invite link copied to clipboard!');
     } catch (error) {
-      console.error('Failed to copy invite link:', error);
-      setCopySuccess('Failed to copy invite link. Please try again.');
+      console.warn('Modern clipboard API failed, trying execCommand fallback.');
+
+      // 现代的 clipboard API 失败时，尝试使用 document.execCommand 作为后备
+      const textArea = document.createElement('textarea');
+      textArea.value = inviteLink;
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+
+      try {
+        const successful = document.execCommand('copy');
+        setCopySuccess(successful ? 'Invite link copied to clipboard!' : 'Failed to copy invite link, please try again.');
+      } catch (err) {
+        console.error('Fallback: Oops, unable to copy', err);
+        setCopySuccess('Failed to copy invite link, please try again.');
+      }
+
+      document.body.removeChild(textArea);
     }
+
     setTimeout(() => setCopySuccess(''), 3000);  // 3秒后清除提示信息
   };
 
