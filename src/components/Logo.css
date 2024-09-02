@@ -1,0 +1,51 @@
+/* Logo.css */
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background-color: #333; /* 深色背景 */
+}
+
+.logo-image {
+  width: 50px;
+  height: auto;
+  margin-right: 20px; /* LOGO和按钮之间的间距 */
+}
+
+.wallet-container {
+  display: flex;
+  align-items: center;
+}
+
+.wallet-button,
+.connect-button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.wallet-button {
+  display: flex;
+  align-items: center;
+}
+
+.wallet-balance {
+  margin-left: 10px;
+}
+
+.connect-button:hover,
+.wallet-button:hover {
+  background-color: #0056b3;
+}
+
+.wallet-container {
+  display: flex;
+  align-items: center;
+  margin-left: auto; /* 使按钮保持靠右显示 */
+}

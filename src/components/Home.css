@@ -1,0 +1,178 @@
+.home-container {
+  padding: 20px;
+  text-align: center;
+  color: #ffffff;
+  background-color: #1b1b1b; /* 深色背景与整体网站匹配 */
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.purchase-section, .mining-section {
+  margin-top: 20px;
+  background-color: #2b2b2b;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.vert-input {
+  padding: 10px;
+  font-size: 16px;
+  background-color: #333;
+  color: #fff;
+  border: 1px solid #007bff;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+
+.short-input {
+  width: 60%; /* 缩短输入框的宽度 */
+}
+
+.purchase-button, .mining-button {
+  padding: 12px;
+  font-size: 16px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.short-button {
+  width: 35%; /* 缩短按钮的宽度 */
+}
+
+.purchase-button:hover, .mining-button:hover {
+  background-color: #218838;
+}
+
+p {
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+.price-info {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #ccc; /* 使用较浅的颜色来显示说明文字 */
+}
+
+.arrow-down {
+  font-size: 24px;
+  color: #ffffff;
+  margin: 20px 0;
+}
+
+.expected-income {
+  font-size: 12px;
+  color: #cccccc;
+  margin-top: 10px;
+}
+
+.staked-vert {
+  font-size: 14px;
+  color: #ffffff;
+  margin-top: 5px;
+}
+/* 在 Home.css 中添加以下样式 */
+
+.mining-section {
+  background-color: #1f1f1f;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  margin-top: 20px;
+  color: #ffffff;
+}
+
+.mining-section h2 {
+  margin-bottom: 15px;
+  font-size: 24px;
+  color: #00d4ff;
+}
+
+.mining-section p {
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: #cfcfcf;
+}
+
+.staking-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.vert-input {
+  width: calc(100% - 20px);
+  padding: 10px;
+  border: 1px solid #333;
+  border-radius: 5px;
+  background-color: #292929;
+  color: #ffffff;
+  margin-bottom: 15px;
+}
+
+.vert-input:focus {
+  border-color: #00d4ff;
+  outline: none;
+}
+
+.short-button {
+  background-color: #00aaff;
+  border: none;
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.short-button:hover {
+  background-color: #0088cc;
+}
+
+.claim-button {
+  background-color: #00ff00;
+  color: #000000;
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 100%;
+}
+
+.claim-button:hover {
+  background-color: #00cc00;
+}
+
+.stake-button,
+.unstake-button {
+  flex: 1;
+}
+
+.arrow-down {
+  text-align: center;
+  font-size: 24px;
+  color: #00d4ff;
+  margin: 15px 0;
+}
+
+.expected-income {
+  font-size: 14px;
+  color: #b0b0b0;
+  margin-bottom: 5px;
+}
+
+.staked-vert {
+  font-size: 16px;
+  color: #ffffff;
+}

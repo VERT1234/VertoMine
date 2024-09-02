@@ -1,0 +1,32 @@
+.footer-container {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: #1b1b1b; /* 深色背景 */
+  padding: 10px 0;
+  display: flex;
+  justify-content: space-around;
+  border-top: 1px solid #444444; /* 顶部边框 */
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2); /* 增加顶部阴影 */
+}
+
+.nav-button {
+  color: #f0f0f0; /* 浅色文字 */
+  font-size: 16px;
+  text-decoration: none;
+  padding: 10px 20px;
+  background-color: #333333; /* 按钮背景色 */
+  border-radius: 5px;
+  border: 1px solid #444444; /* 按钮边框 */
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.nav-button:hover {
+  background-color: #444444; /* 悬停时背景色变化 */
+  border-color: #555555; /* 悬停时边框色变化 */
+}
+
+.nav-button:active {
+  background-color: #555555; /* 点击时背景色变化 */
+  border-color: #666666; /* 点击时边框色变化 */
+}

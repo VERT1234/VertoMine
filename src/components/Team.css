@@ -1,0 +1,68 @@
+.team-container {
+  background-color: #1b1b1b;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  color: #f0f0f0;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.invite-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.invite-input {
+  flex-grow: 1;
+  background-color: #333;
+  border: 1px solid #007bff;
+  border-radius: 5px;
+  padding: 10px;
+  color: #f0f0f0;
+  margin-right: 10px;
+}
+
+.copy-button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.wallet-status {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.status-connected {
+  color: #28a745;
+}
+
+.status-disconnected {
+  color: #dc3545;
+}
+
+.stats-section {
+  margin-top: 20px;
+}
+
+.stats-list {
+  list-style: none;
+  padding: 0;
+}
+
+.stats-list li {
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+.stat-number {
+  font-size: 20px;
+  color: #00d4ff;
+  font-weight: bold;
+}
