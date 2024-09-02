@@ -13,6 +13,7 @@ const Team = ({ account, web3, contract }) => {
   const [totalStakes, setTotalStakes] = useState(0);  // 总质押量
   const [earnedFromStakes, setEarnedFromStakes] = useState(0);  // 从质押中赚取的总量
   const [totalEarned, setTotalEarned] = useState(0);  // 下线为您总共赚取的数量
+  const [copySuccess, setCopySuccess] = useState('');  // 复制成功提示
 
   useEffect(() => {
     if (account && contract) {
@@ -88,11 +89,12 @@ const Team = ({ account, web3, contract }) => {
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(inviteLink);
-      alert('Invite link copied to clipboard');
+      setCopySuccess('Invite link copied to clipboard!');
     } catch (error) {
       console.error('Failed to copy invite link:', error);
-      alert('Failed to copy invite link. Please try again.');
+      setCopySuccess('Failed to copy invite link. Please try again.');
     }
+    setTimeout(() => setCopySuccess(''), 3000);  // 3秒后清除提示信息
   };
 
   return (
@@ -108,6 +110,9 @@ const Team = ({ account, web3, contract }) => {
           Copy Invite Link
         </button>
       </div>
+      {copySuccess && (
+        <p className="copy-success">{copySuccess}</p>
+      )}
       <div className="wallet-status">
         {isConnected ? (
           <p className="status-connected">Wallet is connected</p>
