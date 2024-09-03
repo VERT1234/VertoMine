@@ -1,3 +1,6 @@
+/* Home.css */
+
+/* 全局容器样式 */
 .home-container {
   padding: 20px;
   text-align: center;
@@ -5,14 +8,15 @@
   background-color: #1b1b1b; /* 深色背景与整体网站匹配 */
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  max-width: 400px;
+  max-width: 500px; /* 更宽的容器以适应输入框和按钮 */
   margin: 0 auto;
 }
 
+/* 购买区域和挖矿区域的样式 */
 .purchase-section, .mining-section {
   margin-top: 20px;
   background-color: #2b2b2b;
-  padding: 15px;
+  padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -24,27 +28,29 @@
   color: #fff;
   border: 1px solid #007bff;
   border-radius: 5px;
+  width: 100%; /* 输入框宽度为容器宽度 */
   margin-top: 10px;
+  box-sizing: border-box; /* 包括内边距和边框 */
 }
 
 .short-input {
-  width: 60%; /* 缩短输入框的宽度 */
+  width: 100%; /* 保持输入框宽度与容器一致 */
 }
 
-.purchase-button, .mining-button {
+.purchase-button, .mining-button, .claim-button, .short-button {
   padding: 12px;
   font-size: 16px;
-  background-color: #28a745;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   margin-top: 10px;
   transition: background-color 0.3s ease;
+  width: 100%; /* 按钮宽度为容器宽度 */
 }
 
-.short-button {
-  width: 35%; /* 缩短按钮的宽度 */
+.purchase-button, .mining-button {
+  background-color: #28a745;
 }
 
 .purchase-button:hover, .mining-button:hover {
@@ -63,33 +69,24 @@ p {
 }
 
 .arrow-down {
+  text-align: center;
   font-size: 24px;
-  color: #ffffff;
-  margin: 20px 0;
+  color: #00d4ff;
+  margin: 15px 0;
 }
 
 .expected-income {
-  font-size: 12px;
-  color: #cccccc;
-  margin-top: 10px;
+  font-size: 14px;
+  color: #b0b0b0;
+  margin-bottom: 5px;
 }
 
 .staked-vert {
-  font-size: 14px;
-  color: #ffffff;
-  margin-top: 5px;
-}
-/* 在 Home.css 中添加以下样式 */
-
-.mining-section {
-  background-color: #1f1f1f;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-  margin-top: 20px;
+  font-size: 16px;
   color: #ffffff;
 }
 
+/* 挖矿区域的优化样式 */
 .mining-section h2 {
   margin-bottom: 15px;
   font-size: 24px;
@@ -107,16 +104,6 @@ p {
   gap: 10px;
   flex-wrap: wrap;
   justify-content: space-between;
-  margin-bottom: 15px;
-}
-
-.vert-input {
-  width: calc(100% - 20px);
-  padding: 10px;
-  border: 1px solid #333;
-  border-radius: 5px;
-  background-color: #292929;
-  color: #ffffff;
   margin-bottom: 15px;
 }
 
@@ -159,20 +146,39 @@ p {
   flex: 1;
 }
 
-.arrow-down {
-  text-align: center;
-  font-size: 24px;
-  color: #00d4ff;
-  margin: 15px 0;
+/* 机构代码部分的样式 */
+.institution-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 10px; /* 输入框和按钮之间的间距 */
+  flex-wrap: wrap; /* 使其在小屏幕上可以换行 */
 }
 
-.expected-income {
-  font-size: 14px;
-  color: #b0b0b0;
-  margin-bottom: 5px;
-}
-
-.staked-vert {
+.institution-input {
+  padding: 10px;
+  border: 2px solid #007bff;
+  border-radius: 5px;
   font-size: 16px;
+  flex: 1; /* 输入框占据剩余空间 */
+  background-color: #292929;
   color: #ffffff;
+  box-sizing: border-box;
+}
+
+.apply-button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  border: none;
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+  flex-shrink: 0; /* 按钮不随输入框缩放 */
+}
+
+.apply-button:hover {
+  background-color: #0056b3;
 }

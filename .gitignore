@@ -1,4 +1,6 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# 忽略 .env 文件
+.env
 
 # dependencies
 /node_modules

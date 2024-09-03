@@ -6,6 +6,7 @@ import './Home.css';
 const VERT_CONTRACT_ADDRESS = '0xEd7ac42dEc44E256A5Ab6fB30686c4695F72E726'; // 更新后的合约地址
 const MINING_ADDRESS = '0x29415552aef03D024caD77A45B76E4bF47c9B185'; // 矿池地址
 const USDT_TO_VERT_RATE = 0.03; // 1 VERT = 0.03 USDT
+const DISCOUNT_RATE = 0.5; // 50% 折扣
 
 const VERT_ABI = [
   // 合约 ABI 的定义
@@ -50,6 +51,8 @@ const Home = ({ account }) => {
   const [rewards, setRewards] = useState('0');
   const [web3, setWeb3] = useState(null);
   const [referrer, setReferrer] = useState(null);
+  const [institutionCode, setInstitutionCode] = useState(''); // 机构代码
+  const [isDiscountValid, setIsDiscountValid] = useState(false); // 机构代码是否有效
 
   useEffect(() => {
     if (window.ethereum) {
@@ -153,7 +156,12 @@ const Home = ({ account }) => {
     const vert = e.target.value;
     if (vert >= 0) {
       setVertAmount(vert);
-      const usdtAmount = vert * USDT_TO_VERT_RATE;
+      let usdtAmount = vert * USDT_TO_VERT_RATE;
+
+      if (isDiscountValid) {
+        usdtAmount *= DISCOUNT_RATE; // 应用折扣
+      }
+
       if (bnbPrice) {
         const bnbAmount = usdtAmount / bnbPrice;
         setBnbAmount(bnbAmount.toFixed(6));
@@ -165,6 +173,29 @@ const Home = ({ account }) => {
   const handleMiningAmountChange = (e) => {
     setMiningAmount(e.target.value);
   };
+
+  const validateInstitutionCode = () => {
+  const validCodes = [
+    process.env.REACT_APP_DISCOUNT_CODE_1,
+    process.env.REACT_APP_DISCOUNT_CODE_2,
+    process.env.REACT_APP_DISCOUNT_CODE_3,
+    process.env.REACT_APP_DISCOUNT_CODE_4,
+    process.env.REACT_APP_DISCOUNT_CODE_5,
+    process.env.REACT_APP_DISCOUNT_CODE_6,
+    process.env.REACT_APP_DISCOUNT_CODE_7,
+    process.env.REACT_APP_DISCOUNT_CODE_8,
+    process.env.REACT_APP_DISCOUNT_CODE_9,
+    process.env.REACT_APP_DISCOUNT_CODE_10,
+  ];
+
+  if (validCodes.includes(institutionCode)) {
+    setIsDiscountValid(true);
+    alert('Institution code applied successfully!');
+  } else {
+    setIsDiscountValid(false);
+    alert('Invalid institution code.');
+  }
+};
 
   // 处理购买
   const handlePurchase = async () => {
@@ -261,6 +292,21 @@ const Home = ({ account }) => {
       ) : (
         <p>Loading BNB price...</p>
       )}
+
+      {/* 机构代码输入框 */}
+      <div className="institution-section">
+        <input
+          type="text"
+          placeholder="Enter institution code"
+          value={institutionCode}
+          onChange={(e) => setInstitutionCode(e.target.value)}
+          className="institution-input short-input"
+        />
+        <button onClick={validateInstitutionCode} className="apply-button short-button">
+          Apply Institution Code
+        </button>
+      </div>
+
       <div className="purchase-section">
         <input
           type="number"
