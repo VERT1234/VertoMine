@@ -6,7 +6,7 @@ import './Home.css';
 const VERT_CONTRACT_ADDRESS = '0xEd7ac42dEc44E256A5Ab6fB30686c4695F72E726'; // 更新后的合约地址
 const MINING_ADDRESS = '0x29415552aef03D024caD77A45B76E4bF47c9B185'; // 矿池地址
 const USDT_TO_VERT_RATE = 0.03; // 1 VERT = 0.03 USDT
-const DISCOUNT_RATE = 0.5; // 50% 折扣
+const DISCOUNT_RATE = 0.8; // 80% 折扣
 
 const VERT_ABI = [
   // 合约 ABI 的定义
