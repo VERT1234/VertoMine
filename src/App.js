@@ -62,7 +62,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Home account={account} web3={web3} contract={contract} />} />
             <Route path="/team" element={<Team account={account} web3={web3} contract={contract} />} />
-            <Route path="/settings" element={<Settings />} />
+            <Route path="/settings" element={<Settings account={account} web3={web3} contract={contract} />} />
           </Routes>
         </div>
         <Footer />

@@ -7,6 +7,7 @@ const VERT_CONTRACT_ADDRESS = '0xEd7ac42dEc44E256A5Ab6fB30686c4695F72E726'; // �
 const MINING_ADDRESS = '0x29415552aef03D024caD77A45B76E4bF47c9B185'; // 矿池地址
 const USDT_TO_VERT_RATE = 0.03; // 1 VERT = 0.03 USDT
 const DISCOUNT_RATE = 0.8; // 80% 折扣
+const MIN_VERT_AMOUNT = 200; // 最低购买数量限制
 
 const VERT_ABI = [
   // 合约 ABI 的定义
@@ -175,31 +176,37 @@ const Home = ({ account }) => {
   };
 
   const validateInstitutionCode = () => {
-  const validCodes = [
-    process.env.REACT_APP_DISCOUNT_CODE_1,
-    process.env.REACT_APP_DISCOUNT_CODE_2,
-    process.env.REACT_APP_DISCOUNT_CODE_3,
-    process.env.REACT_APP_DISCOUNT_CODE_4,
-    process.env.REACT_APP_DISCOUNT_CODE_5,
-    process.env.REACT_APP_DISCOUNT_CODE_6,
-    process.env.REACT_APP_DISCOUNT_CODE_7,
-    process.env.REACT_APP_DISCOUNT_CODE_8,
-    process.env.REACT_APP_DISCOUNT_CODE_9,
-    process.env.REACT_APP_DISCOUNT_CODE_10,
-  ];
+    const validCodes = [
+      process.env.REACT_APP_DISCOUNT_CODE_1,
+      process.env.REACT_APP_DISCOUNT_CODE_2,
+      process.env.REACT_APP_DISCOUNT_CODE_3,
+      process.env.REACT_APP_DISCOUNT_CODE_4,
+      process.env.REACT_APP_DISCOUNT_CODE_5,
+      process.env.REACT_APP_DISCOUNT_CODE_6,
+      process.env.REACT_APP_DISCOUNT_CODE_7,
+      process.env.REACT_APP_DISCOUNT_CODE_8,
+      process.env.REACT_APP_DISCOUNT_CODE_9,
+      process.env.REACT_APP_DISCOUNT_CODE_10,
+    ];
 
-  if (validCodes.includes(institutionCode)) {
-    setIsDiscountValid(true);
-    alert('Institution code applied successfully!');
-  } else {
-    setIsDiscountValid(false);
-    alert('Invalid institution code.');
-  }
-};
+    if (validCodes.includes(institutionCode)) {
+      setIsDiscountValid(true);
+      alert('Institution code applied successfully!');
+    } else {
+      setIsDiscountValid(false);
+      alert('Invalid institution code.');
+    }
+  };
 
   // 处理购买
   const handlePurchase = async () => {
     if (web3 && account && vertAmount && bnbAmount) {
+      // 检查VERT是否大于最低限额
+      if (parseFloat(vertAmount) < MIN_VERT_AMOUNT) {
+        alert(`You must purchase at least ${MIN_VERT_AMOUNT} VERT.`);
+        return;
+      }
+
       if (parseFloat(bnbBalance) < parseFloat(bnbAmount)) {
         alert('You do not have enough BNB to complete this purchase.');
         return;
