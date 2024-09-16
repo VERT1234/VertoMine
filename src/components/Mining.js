@@ -7,22 +7,14 @@ const Mining = ({ account }) => {
   const [canMine, setCanMine] = useState(false);
   const [miningTotal, setMiningTotal] = useState(0); // 记录总挖矿数
   const [isMining, setIsMining] = useState(false);
-<<<<<<< HEAD
   const [hasMined, setHasMined] = useState(false); // 新增状态，记录是否已完成挖矿但未提现
-=======
-  const [hasMined, setHasMined] = useState(false); // 记录是否已完成挖矿但未提现
->>>>>>> 27a21b78908f82433df27196941f8e5628c93544
   const [timer, setTimer] = useState(60); // 倒计时，默认为60秒
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [miningClicks, setMiningClicks] = useState(0); // 记录点击次数
 
-<<<<<<< HEAD
   // 智能合约的 ABI 和地址
   const contractABI = [ 
-=======
-  const contractABI = [
->>>>>>> 27a21b78908f82433df27196941f8e5628c93544
   {"inputs":[],"stateMutability":"nonpayable","type":"constructor"},
   {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},
   {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},
@@ -52,11 +44,7 @@ const Mining = ({ account }) => {
   {"inputs":[{"internalType":"address","name":"sender","type":"address"},{"internalType":"address","name":"recipient","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},
   {"inputs":[{"internalType":"uint256","name":"_index","type":"uint256"}],"name":"unstakeTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},
   {"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"withdrawBNB","outputs":[],"stateMutability":"nonpayable","type":"function"},
-<<<<<<< HEAD
   {"stateMutability":"payable","type":"receive"} 
-=======
-  {"stateMutability":"payable","type":"receive"}
->>>>>>> 27a21b78908f82433df27196941f8e5628c93544
   ];
   const contractAddress = '0xEd7ac42dEc44E256A5Ab6fB30686c4695F72E726'; // 合约地址
 
@@ -67,7 +55,6 @@ const Mining = ({ account }) => {
   }, [account]);
 
   const checkCanMine = async () => {
-<<<<<<< HEAD
     try {
       const response = await axios.get(`/canMine/${account}`);
       setCanMine(response.data.canMine);
@@ -95,43 +82,6 @@ const handleClickMine = () => {
 };
 
 
-=======
-  try {
-    const token = localStorage.getItem('miningToken');
-
-    const response = await axios.get(`/api/canMine`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,  // 携带 JWT
-      },
-      params: { wallet: account }
-    });
-
-    setCanMine(response.data.canMine);
-  } catch (err) {
-    setErrorMessage('Error fetching mining status.');
-    console.error('Error fetching mining status:', err);  // 打印错误信息进行调试
-  }
-};
-
-
-  // 点击挖矿按钮，增加随机的挖矿数量
-  const handleClickMine = () => {
-    if (!canMine || timer <= 0 || !account) {
-      setErrorMessage('Cannot mine. Please ensure wallet is connected and try again.');
-      return;
-    }
-
-    const reward = (Math.random() * 0.15 + 0.05).toFixed(3); // 生成 0.05 到 0.2 之间的随机Vert数量
-    setMiningTotal((prevTotal) => prevTotal + parseFloat(reward)); // 增加总挖矿数
-    setMiningClicks((prevClicks) => prevClicks + 1); // 增加点击次数
-
-    // 添加点击效果
-    const button = document.querySelector('.mining-button');
-    button.classList.add('clicked');
-    setTimeout(() => button.classList.remove('clicked'), 200); // 200ms后移除点击效果
-  };
-
->>>>>>> 27a21b78908f82433df27196941f8e5628c93544
   // 倒计时逻辑
   useEffect(() => {
     if (timer > 0 && isMining) {
@@ -146,7 +96,6 @@ const handleClickMine = () => {
     }
   }, [timer, isMining]);
 
-<<<<<<< HEAD
   // 开始挖矿，启动倒计时
   const startMining = async () => {
     if (!canMine || !account) {
@@ -165,34 +114,6 @@ const handleClickMine = () => {
       console.error('Error updating mining time:', err);
     }
   };
-=======
-  // 开始挖矿，启动倒计时并存储 JWT
-  const startMining = async () => {
-  if (!canMine || !account) {
-    setErrorMessage('Please connect your wallet to start mining.');
-    return;
-  }
-  setIsMining(true);
-  setErrorMessage('');
-  setHasMined(false); // 重置 hasMined 状态
-
-  // 更新挖矿时间
-  try {
-    const response = await axios.post(`/api/updateMiningTime`, null, {
-      params: { wallet: account },
-    });
-
-    if (response.data.success) {
-      localStorage.setItem('miningToken', response.data.token); // 存储 JWT
-    }
-
-  } catch (err) {
-    setErrorMessage('Failed to update mining time.');
-    console.error('Error updating mining time:', err);
-  }
-};
-
->>>>>>> 27a21b78908f82433df27196941f8e5628c93544
 
   // 提现代币
   const handleWithdraw = async () => {
@@ -202,31 +123,19 @@ const handleClickMine = () => {
     }
 
     try {
-<<<<<<< HEAD
       // 初始化Web3，连接钱包
-=======
->>>>>>> 27a21b78908f82433df27196941f8e5628c93544
       const web3 = new Web3(window.ethereum);
       const contract = new web3.eth.Contract(contractABI, contractAddress);
       const amountToWithdraw = web3.utils.toWei(miningTotal.toString(), 'ether'); // 转换为Wei
 
-<<<<<<< HEAD
       // 用户支付Gas费用并调用智能合约的distributeTokens函数
       await contract.methods.distributeTokens(account, amountToWithdraw).send({
         from: account,  // 用户钱包地址
-=======
-      await contract.methods.distributeTokens(account, amountToWithdraw).send({
-        from: account,
->>>>>>> 27a21b78908f82433df27196941f8e5628c93544
         gas: 300000,
       });
 
       setSuccessMessage('Tokens withdrawn successfully!');
-<<<<<<< HEAD
       setMiningTotal(0); // 提现后清空挖矿总数
-=======
-      setMiningTotal(0); // 清空挖矿总数
->>>>>>> 27a21b78908f82433df27196941f8e5628c93544
       setMiningClicks(0); // 清空点击次数
       setHasMined(false); // 重置 hasMined 状态
       checkCanMine(); // 刷新 canMine 状态
@@ -238,11 +147,7 @@ const handleClickMine = () => {
 
   return (
     <div className="mining-container">
-<<<<<<< HEAD
       <h1 className="mining-main-title">CLICK LIKE CRAZY!</h1>  {/* 主标题 */}
-=======
-      <h1 className="mining-main-title">CLICK LIKE CRAZY!</h1>
->>>>>>> 27a21b78908f82433df27196941f8e5628c93544
       <h1 className="mining-header">Mining Area</h1>
 
       {!account ? (
@@ -298,11 +203,7 @@ const handleClickMine = () => {
 
       <p className="mining-warning">
         During mining, please do not leave this page. After mining is complete, you will need to withdraw the mined Vert tokens to your BSC wallet. If you do not withdraw, the collected Vert will be lost.
-<<<<<<< HEAD
       </p>  {/* 提示文字容器 */}
-=======
-      </p>
->>>>>>> 27a21b78908f82433df27196941f8e5628c93544
     </div>
   );
 };
