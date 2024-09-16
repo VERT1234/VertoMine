@@ -54,20 +54,23 @@ const Mining = ({ account }) => {
   }, [account]);
 
   const checkCanMine = async () => {
-    try {
-      const token = localStorage.getItem('miningToken');
-      const response = await axios.get(`/api/canMine`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,  // 携带 JWT
-        },
-        params: { wallet: account }
-      });
-      setCanMine(response.data.canMine);
-    } catch (err) {
-      setErrorMessage('Error fetching mining status.');
-      console.error('Error fetching mining status:', err);
-    }
-  };
+  try {
+    const token = localStorage.getItem('miningToken');
+
+    const response = await axios.get(`/api/canMine`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,  // 携带 JWT
+      },
+      params: { wallet: account }
+    });
+
+    setCanMine(response.data.canMine);
+  } catch (err) {
+    setErrorMessage('Error fetching mining status.');
+    console.error('Error fetching mining status:', err);  // 打印错误信息进行调试
+  }
+};
+
 
   // 点击挖矿按钮，增加随机的挖矿数量
   const handleClickMine = () => {
@@ -102,29 +105,30 @@ const Mining = ({ account }) => {
 
   // 开始挖矿，启动倒计时并存储 JWT
   const startMining = async () => {
-    if (!canMine || !account) {
-      setErrorMessage('Please connect your wallet to start mining.');
-      return;
+  if (!canMine || !account) {
+    setErrorMessage('Please connect your wallet to start mining.');
+    return;
+  }
+  setIsMining(true);
+  setErrorMessage('');
+  setHasMined(false); // 重置 hasMined 状态
+
+  // 更新挖矿时间
+  try {
+    const response = await axios.post(`/api/updateMiningTime`, null, {
+      params: { wallet: account },
+    });
+
+    if (response.data.success) {
+      localStorage.setItem('miningToken', response.data.token); // 存储 JWT
     }
-    setIsMining(true);
-    setErrorMessage('');
-    setHasMined(false); // 重置 hasMined 状态
 
-    // 更新挖矿时间
-    try {
-      const response = await axios.post(`/api/updateMiningTime`, null, {
-        params: { wallet: account },
-      });
+  } catch (err) {
+    setErrorMessage('Failed to update mining time.');
+    console.error('Error updating mining time:', err);
+  }
+};
 
-      if (response.data.success) {
-        localStorage.setItem('miningToken', response.data.token); // 存储 JWT
-      }
-
-    } catch (err) {
-      setErrorMessage('Failed to update mining time.');
-      console.error('Error updating mining time:', err);
-    }
-  };
 
   // 提现代币
   const handleWithdraw = async () => {

@@ -1,12 +1,19 @@
 const jwt = require('jsonwebtoken');
-const SECRET_KEY = 'K29udXdTQ3FjUHZKdVJDb3ZTbHV5WXhWYjRlNU9HVFA=';  // 设置你的密钥
 
 module.exports = async (req, res) => {
-  const wallet = req.query.wallet;  // 获取用户的钱包地址
+  const { wallet } = req.query;  // 使用 req.query 代替 req.params
   const currentTime = Date.now();
 
-  // 生成新的 JWT，将当前时间存储为上次挖矿时间
-  const token = jwt.sign({ wallet, lastMiningTime: currentTime }, SECRET_KEY, { expiresIn: '24h' });
+  // 生成 JWT，包含钱包地址和挖矿时间
+  const token = jwt.sign(
+    { wallet, lastMiningTime: currentTime }, 
+    process.env.SECRET_KEY, // 使用环境变量作为密钥
+    { expiresIn: '24h' } // 设置 JWT 的过期时间为 24 小时
+  );
 
-  res.json({ success: true, token });
+  // 更新挖矿时间
+  miningTimes[wallet] = currentTime;  // 更新挖矿时间
+
+  // 返回 JWT 和成功信息
+  res.status(200).json({ success: true, token });
 };
