@@ -1,0 +1,206 @@
+/* 矿区主容器样式 */
+.mining-container {
+  max-width: 1200px;
+  margin: 0 auto; /* 自动居中 */
+  padding: 20px;
+  text-align: center;
+  background-color: #0e0e0e; /* 深色背景 */
+  border-radius: 10px;
+  box-shadow: 0px 0px 20px rgba(0, 255, 255, 0.2); /* 青色光晕 */
+}
+
+/* 页面主标题样式 */
+.mining-main-title {
+  font-size: 32px;
+  color: #00ffff; /* 青色 */
+  margin-bottom: 20px;
+  font-weight: bold;
+  text-shadow: 0px 0px 10px #00ffff; /* 文字发光效果 */
+}
+
+/* 矿区头部样式 */
+.mining-header {
+  font-size: 24px;
+  color: #ffffff;
+  margin-bottom: 10px;
+}
+
+/* 矿区账户信息样式 */
+.mining-account {
+  font-size: 18px;
+  color: #cccccc;
+  margin-bottom: 20px;
+}
+
+/* 矿区总量显示 */
+.mining-total {
+  font-size: 20px;
+  color: #00ff00; /* 亮绿色 */
+  margin-top: 10px;
+  text-shadow: 0px 0px 5px #00ff00; /* 文字发光效果 */
+}
+
+/* 错误信息和成功消息的样式 */
+.error-message {
+  color: #ff3366; /* 亮红色 */
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+.success-message {
+  color: #66ff66; /* 亮绿色 */
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+/* 矿区行动按钮样式 */
+.mining-action {
+  margin-top: 20px;
+}
+
+/* 矿区开始按钮 */
+.mining-start-button {
+  font-size: 18px;
+  padding: 10px 20px;
+  background: linear-gradient(45deg, #00ffff, #0066ff); /* 渐变色背景 */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0px 0px 10px #00ffff;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+.mining-start-button:hover {
+  background: linear-gradient(45deg, #0066ff, #00ffff);
+  box-shadow: 0px 0px 20px #00ffff;
+}
+
+/* 圆形挖矿按钮 */
+.mining-button {
+  font-size: 20px;
+  padding: 20px;
+  border-radius: 50%; /* 圆形按钮 */
+  background: radial-gradient(circle at center, #00ffcc, #0066ff); /* 放射性渐变 */
+  color: white;
+  border: none;
+  cursor: pointer;
+  margin-top: 10px;
+  box-shadow: 0px 0px 15px #00ffcc;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.mining-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0px 0px 25px #00ffcc;
+}
+
+.mining-button.clicked {
+  box-shadow: 0px 0px 30px #ffffff;
+  transform: scale(1.2);
+}
+
+/* 进度条容器 */
+.progress-container {
+  margin-top: 10px;
+}
+
+progress {
+  width: 100%;
+  height: 20px;
+  border-radius: 10px;
+  background-color: #333333;
+  overflow: hidden;
+  box-shadow: inset 0px 0px 5px #000000;
+}
+
+progress::-webkit-progress-bar {
+  background-color: #333333;
+}
+
+progress::-webkit-progress-value {
+  background-color: #00ccff;
+  box-shadow: 0px 0px 10px #00ccff;
+}
+
+/* 提现按钮 */
+.withdraw-button {
+  font-size: 16px;
+  padding: 12px 25px;
+  background: linear-gradient(45deg, #ff00ff, #ff0066);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  margin-top: 20px;
+  cursor: pointer;
+  box-shadow: 0px 0px 10px #ff00ff;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+.withdraw-button:hover {
+  background: linear-gradient(45deg, #ff0066, #ff00ff);
+  box-shadow: 0px 0px 20px #ff00ff;
+}
+
+.withdraw-button:disabled {
+  background-color: #555555;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* 提示文字容器 */
+.mining-warning {
+  font-size: 14px;
+  color: #cccccc;
+  margin-top: 30px;
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 10px;
+  background-color: #1a1a1a;
+  border-left: 4px solid #ff3366; /* 亮红色提示边框 */
+  border-radius: 8px;
+}
+
+/* 错误信息显示 */
+.mining-error {
+  font-size: 16px;
+  color: #ff3366;
+  margin-top: 10px;
+}
+
+/* 自适应布局 */
+@media (max-width: 768px) {
+  .mining-container {
+    padding: 10px;
+  }
+
+  .mining-button {
+    padding: 15px;
+    font-size: 18px;
+  }
+
+  .mining-main-title {
+    font-size: 24px;
+  }
+
+  .mining-header {
+    font-size: 20px;
+  }
+
+  .mining-account {
+    font-size: 16px;
+  }
+
+  .mining-total {
+    font-size: 18px;
+  }
+
+  .withdraw-button {
+    font-size: 14px;
+    padding: 10px 20px;
+  }
+
+  .mining-warning {
+    font-size: 12px;
+  }
+}

@@ -1,156 +1,131 @@
 import React, { useState, useEffect } from 'react';
-import './Team.css';
+import Web3 from 'web3';
+import './Mining.css'; // Ensure the stylesheet is correctly imported
 
-const Team = ({ account, web3, contract }) => {
-  const [inviteLink, setInviteLink] = useState('Please connect your wallet to generate an invite link.');
-  const [loading, setLoading] = useState(false);
-  const [isConnected, setIsConnected] = useState(false);
-  const [totalClicks, setTotalClicks] = useState(0);  // 总点击量
-  const [yesterdayClicks, setYesterdayClicks] = useState(0);  // 昨日点击量
-  const [yesterdayPurchases, setYesterdayPurchases] = useState(0);  // 昨日购买量
-  const [totalPurchases, setTotalPurchases] = useState(0);  // 总购买量
-  const [earnedFromPurchases, setEarnedFromPurchases] = useState(0);  // 从购买中赚取的总量
-  const [totalStakes, setTotalStakes] = useState(0);  // 总质押量
-  const [earnedFromStakes, setEarnedFromStakes] = useState(0);  // 从质押中赚取的总量
-  const [totalEarned, setTotalEarned] = useState(0);  // 下线为您总共赚取的数量
-  const [copySuccess, setCopySuccess] = useState('');  // 复制成功提示
+const MINING_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+const BSC_CHAIN_ID = '0x38'; // BSC 主网的 Chain ID (十六进制)
+
+const Mining = ({ account, web3 }) => {
+  const [lastMiningTime, setLastMiningTime] = useState(null);
+  const [miningInProgress, setMiningInProgress] = useState(false);
+  const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const [isCorrectNetwork, setIsCorrectNetwork] = useState(false);
 
   useEffect(() => {
-    if (account && contract) {
-      setIsConnected(true);
-      generateInviteLink(account);
-      fetchReferralStats(account);  // 获取点击统计信息
-    } else {
-      setIsConnected(false);
-      setInviteLink('Please connect your wallet to generate an invite link.');
-      resetStats();
+    if (account && web3) {
+      checkNetwork();
+      fetchLastMiningTime();
     }
-  }, [account, contract]);
+  }, [account, web3]);
 
-  // 生成邀请链接
-  const generateInviteLink = (address) => {
-    const baseUrl = window.location.origin;
-    setInviteLink(`${baseUrl}?ref=${address}`);
-  };
-
-  // 重置统计数据
-  const resetStats = () => {
-    setTotalClicks(0);
-    setYesterdayClicks(0);
-    setYesterdayPurchases(0);
-    setTotalPurchases(0);
-    setEarnedFromPurchases(0);
-    setTotalStakes(0);
-    setEarnedFromStakes(0);
-    setTotalEarned(0);
-  };
-
-  // 获取邀请链接的统计数据
-  const fetchReferralStats = async (account) => {
-    setLoading(true);
+  const checkNetwork = async () => {
     try {
-      const stats = await contract.methods.getReferralStats(account).call();
-      console.log('Referral Stats:', stats);  // 调试时输出
-      setTotalClicks(parseInt(stats.totalClicks, 10));
-      setYesterdayClicks(calculateYesterdayClicks(stats.lastClicked));
-      setYesterdayPurchases(calculateYesterdayPurchases(stats.lastPurchaseTime));
-      setTotalPurchases(parseInt(stats.totalPurchases, 10));
-      setEarnedFromPurchases(parseFloat(web3.utils.fromWei(stats.totalPurchaseAmount, 'ether')));
-      setTotalStakes(parseInt(stats.totalStakes, 10));
-      setEarnedFromStakes(parseFloat(web3.utils.fromWei(stats.totalStakeAmount, 'ether')));
-      setTotalEarned(parseFloat(web3.utils.fromWei(stats.totalEarned, 'ether')));
-    } catch (error) {
-      console.error('Error fetching referral stats:', error);
-      resetStats();
+      const chainId = await web3.eth.getChainId();
+      if (chainId === parseInt(BSC_CHAIN_ID, 16)) {
+        setIsCorrectNetwork(true);
+      } else {
+        setIsCorrectNetwork(false);
+        setError('Please switch to the Binance Smart Chain (BSC) network.');
+      }
+    } catch (err) {
+      console.error('Error checking network:', err);
+      setError('Failed to detect network.');
     }
-    setLoading(false);
   };
 
-  // 示例函数，用于计算昨日点击量
-  const calculateYesterdayClicks = (lastClicked) => {
-    const now = Math.floor(Date.now() / 1000);
-    const oneDayInSeconds = 86400;
-    if (lastClicked > now - oneDayInSeconds) {
-      return 1; // 示例逻辑，你可以根据实际需求调整
-    }
-    return 0;
-  };
-
-  // 示例函数，用于计算昨日购买量
-  const calculateYesterdayPurchases = (lastPurchaseTime) => {
-    const now = Math.floor(Date.now() / 1000);
-    const oneDayInSeconds = 86400;
-    if (lastPurchaseTime > now - oneDayInSeconds) {
-      return 1; // 示例逻辑，你可以根据实际需求调整
-    }
-    return 0;
-  };
-
-  const handleCopy = async () => {
+  const fetchLastMiningTime = async () => {
     try {
-      // 尝试使用现代的 clipboard API
-      await navigator.clipboard.writeText(inviteLink);
-      setCopySuccess('Invite link copied to clipboard!');
-    } catch (error) {
-      console.warn('Modern clipboard API failed, trying execCommand fallback.');
+      const latestBlockNumber = await web3.eth.getBlockNumber();
 
-      // 现代的 clipboard API 失败时，尝试使用 document.execCommand 作为后备
-      const textArea = document.createElement('textarea');
-      textArea.value = inviteLink;
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
+      const blocksToCheck = 10000; // This number depends on your network's block time
+      const startBlock = Math.max(0, latestBlockNumber - blocksToCheck);
 
-      try {
-        const successful = document.execCommand('copy');
-        setCopySuccess(successful ? 'Invite link copied to clipboard!' : 'Failed to copy invite link, please try again.');
-      } catch (err) {
-        console.error('Fallback: Oops, unable to copy', err);
-        setCopySuccess('Failed to copy invite link, please try again.');
+      for (let i = latestBlockNumber; i >= startBlock; i--) {
+        const block = await web3.eth.getBlock(i, true);
+        if (block && block.transactions) {
+          for (let tx of block.transactions) {
+            if (
+              tx.from &&
+              tx.from.toLowerCase() === account.toLowerCase() &&
+              tx.to &&
+              tx.to.toLowerCase() === '0xyourminingcontractaddress' // Replace with your mining contract address in lowercase
+            ) {
+              const txTime = block.timestamp * 1000; // Convert to milliseconds
+              setLastMiningTime(txTime);
+              return;
+            }
+          }
+        }
       }
 
-      document.body.removeChild(textArea);
+      setLastMiningTime(null);
+    } catch (err) {
+      console.error('Error fetching last mining time:', err);
+      setError('Failed to fetch last mining time.');
+    }
+  };
+
+  const handleMining = async () => {
+    if (!account || !web3) {
+      setError('Please connect your wallet.');
+      return;
     }
 
-    setTimeout(() => setCopySuccess(''), 3000);  // 3秒后清除提示信息
+    if (!isCorrectNetwork) {
+      setError('Please switch to the Binance Smart Chain (BSC) network.');
+      return;
+    }
+
+    try {
+      const currentTime = Date.now();
+
+      if (lastMiningTime && currentTime - lastMiningTime < MINING_INTERVAL) {
+        const timeLeft = MINING_INTERVAL - (currentTime - lastMiningTime);
+        const hoursLeft = (timeLeft / (1000 * 60 * 60)).toFixed(2);
+        setError(`You can only mine once every 24 hours. Please wait another ${hoursLeft} hours.`);
+        return;
+      }
+
+      setMiningInProgress(true);
+      setError('');
+
+      const transaction = {
+        from: account,
+        to: '0xYourMiningContractAddress', // Replace with your mining contract address
+        value: web3.utils.toWei('0.01', 'ether'), // Adjust the value as needed
+        gas: 200000,
+      };
+
+      await web3.eth.sendTransaction(transaction);
+
+      setLastMiningTime(Date.now());
+      setSuccessMessage('Successfully mined VERT!');
+    } catch (err) {
+      console.error('Mining error:', err);
+      setError('An error occurred during mining. Please try again.');
+    } finally {
+      setMiningInProgress(false);
+    }
   };
 
   return (
-    <div className="team-container">
-      <div className="invite-section">
-        <input
-          type="text"
-          value={inviteLink}
-          readOnly
-          className="invite-input"
-        />
-        <button onClick={handleCopy} className="copy-button" disabled={!isConnected}>
-          Copy Invite Link
-        </button>
-      </div>
-      {copySuccess && (
-        <p className="copy-success">{copySuccess}</p>
+    <div className="mining-container">
+      <h1>VERT Token Mining</h1>
+      {!isCorrectNetwork && (
+        <p className="error-message">Please switch to the Binance Smart Chain (BSC) network to continue mining.</p>
       )}
-      <div className="wallet-status">
-        {isConnected ? (
-          <p className="status-connected">Wallet is connected</p>
-        ) : (
-          <p className="status-disconnected">Wallet is not connected</p>
-        )}
-      </div>
-      <div className="stats-section">
-        <h3>Referral Statistics</h3>
-        <p>Total clicks on your invite link: <strong>{totalClicks}</strong></p>
-        <p>Clicks on your invite link yesterday: <strong>{yesterdayClicks}</strong></p>
-        <p>Yesterday's purchases via your link: <strong>{yesterdayPurchases}</strong></p>
-        <p>Total purchases via your link: <strong>{totalPurchases}</strong></p>
-        <p>Total earned from purchases: <strong>{earnedFromPurchases} VERT</strong></p>
-        <p>Total stakes via your link: <strong>{totalStakes}</strong></p>
-        <p>Total earned from stakes: <strong>{earnedFromStakes} VERT</strong></p>
-        <p>Total earned from your referrals: <strong>{totalEarned} VERT</strong></p>
-      </div>
+      <button
+        onClick={handleMining}
+        disabled={miningInProgress || !isCorrectNetwork}
+        className="mining-button"
+      >
+        {miningInProgress ? 'Mining in progress...' : 'Start Mining'}
+      </button>
+      {error && <p className="error-message">{error}</p>}
+      {successMessage && <p className="success-message">{successMessage}</p>}
     </div>
   );
 };
 
-export default Team;
+export default Mining;
