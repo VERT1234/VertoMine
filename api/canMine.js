@@ -1,10 +1,25 @@
-const miningTimes = {};  // 假设这是存储挖矿时间的数据
+const jwt = require('jsonwebtoken');
+
+const SECRET_KEY = 'K29udXdTQ3FjUHZKdVJDb3ZTbHV5WXhWYjRlNU9HVFA=';  // 请确保密钥的安全
 
 module.exports = async (req, res) => {
-  const { wallet } = req.query;  // 使用 req.query 代替 req.params
-  const lastMiningTime = miningTimes[wallet] || 0;
-  const currentTime = Date.now();
-  const canMine = (currentTime - lastMiningTime) >= 24 * 60 * 60 * 1000;  // 24 小时挖矿限制
+  const token = req.headers.authorization?.split(' ')[1];  // 获取 JWT
+  if (!token) {
+    return res.status(403).json({ canMine: false, message: 'No token provided.' });
+  }
 
-  res.status(200).json({ canMine });
+  try {
+    // 验证 JWT
+    const decoded = jwt.verify(token, SECRET_KEY);
+    const lastMiningTime = decoded.lastMiningTime;
+    const currentTime = Date.now();
+
+    // 检查是否已经过了 24 小时
+    const canMine = (currentTime - lastMiningTime) >= 24 * 60 * 60 * 1000;
+
+    res.json({ canMine });
+  } catch (error) {
+    console.error('Error verifying token:', error);
+    return res.status(401).json({ canMine: false, message: 'Invalid token.' });
+  }
 };

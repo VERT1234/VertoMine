@@ -29,20 +29,19 @@ const contractABI = [
   {"inputs":[{"internalType":"address","name":"sender","type":"address"},{"internalType":"address","name":"recipient","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},
   {"inputs":[{"internalType":"uint256","name":"_index","type":"uint256"}],"name":"unstakeTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},
   {"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"withdrawBNB","outputs":[],"stateMutability":"nonpayable","type":"function"},
-  {"stateMutability":"payable","type":"receive"}];  // 确保你在这里定义 ABI
-const contractAddress = process.env.CONTRACT_ADDRESS;  // 使用环境变量存储合约地址
-
-const web3 = new Web3(process.env.BSC_PROVIDER);  // 使用环境变量存储 BSC 节点
-const contract = new web3.eth.Contract(contractABI, contractAddress);
+  {"stateMutability":"payable","type":"receive"}
+  ];
+const contractAddress = process.env.CONTRACT_ADDRESS;
+const web3 = new Web3(process.env.BSC_PROVIDER);  // 使用 BSC 节点
 
 module.exports = async (req, res) => {
-  const { wallet } = req.query;  // 使用 req.query 代替 req.params
+  const { wallet } = req.query;
   const { amount } = req.body;
 
   try {
-    // 通过合约发送代币
+    // 调用合约的 distributeTokens 方法
     await contract.methods.distributeTokens(wallet, web3.utils.toWei(amount.toString(), 'ether')).send({
-      from: process.env.WALLET_ADDRESS,  // 使用环境变量中的钱包地址
+      from: process.env.WALLET_ADDRESS,  // 使用你的合约钱包地址
       gas: 3000000
     });
 
