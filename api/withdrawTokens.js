@@ -1,7 +1,11 @@
+<<<<<<< HEAD
 // api/withdrawTokens.js
 import Web3 from 'web3';
 
 const web3 = new Web3(process.env.BSC_PROVIDER || "https://bsc-dataseed.binance.org/");
+=======
+const Web3 = require('web3');
+>>>>>>> 27a21b78908f82433df27196941f8e5628c93544
 const contractABI = [
   {"inputs":[],"stateMutability":"nonpayable","type":"constructor"},
   {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},
@@ -35,6 +39,7 @@ const contractABI = [
   {"stateMutability":"payable","type":"receive"}
   ];
 const contractAddress = process.env.CONTRACT_ADDRESS;
+<<<<<<< HEAD
 const contract = new web3.eth.Contract(contractABI, contractAddress);
 
 export default async function handler(req, res) {
@@ -48,8 +53,28 @@ export default async function handler(req, res) {
     });
 
     res.json({ success: true });
+=======
+const web3 = new Web3(process.env.BSC_PROVIDER);  // 使用 BSC 节点
+
+module.exports = async (req, res) => {
+  const { wallet } = req.query;
+  const { amount } = req.body;
+
+  try {
+    // 调用合约的 distributeTokens 方法
+    await contract.methods.distributeTokens(wallet, web3.utils.toWei(amount.toString(), 'ether')).send({
+      from: process.env.WALLET_ADDRESS,  // 使用你的合约钱包地址
+      gas: 3000000
+    });
+
+    res.status(200).json({ success: true });
+>>>>>>> 27a21b78908f82433df27196941f8e5628c93544
   } catch (error) {
     console.error('Error processing withdrawal:', error);
     res.status(500).json({ success: false, message: 'Failed to withdraw tokens.' });
   }
+<<<<<<< HEAD
 }
+=======
+};
+>>>>>>> 27a21b78908f82433df27196941f8e5628c93544
