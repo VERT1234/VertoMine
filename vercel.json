@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "api/*.js", "use": "@vercel/node" }
+  ],
+  "routes": [
+    { "src": "/api/canMine", "dest": "/api/canMine.js" },
+    { "src": "/api/updateMiningTime", "dest": "/api/updateMiningTime.js" },
+    { "src": "/api/withdrawTokens", "dest": "/api/withdrawTokens.js" }
+  ]
+}

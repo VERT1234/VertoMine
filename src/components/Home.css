@@ -1,83 +1,109 @@
-/* Home.css */
-
-/* 全局容器样式 */
+/* Global container styles */
 .home-container {
   padding: 20px;
   text-align: center;
-  color: #ffffff;
-  background-color: #1b1b1b; /* 深色背景与整体网站匹配 */
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  max-width: 500px; /* 更宽的容器以适应输入框和按钮 */
-  margin: 0 auto;
+  color: #f5f5f5;
+  background: linear-gradient(135deg, #1c1c1e, #2c2c2e); /* 渐变背景 */
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
+  max-width: 600px; /* 调整宽度 */
+  margin: 30px auto;
+  font-family: 'Roboto', sans-serif;
 }
 
-/* 购买区域和挖矿区域的样式 */
+/* Section styles for purchase and mining */
 .purchase-section, .mining-section {
   margin-top: 20px;
-  background-color: #2b2b2b;
+  background-color: #2b2b2d; /* 深灰色背景 */
   padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4); /* 更深的阴影 */
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
+.purchase-section:hover, .mining-section:hover {
+  transform: translateY(-5px); /* 鼠标悬停时轻微上移 */
+}
+
+/* Input styles */
 .vert-input {
-  padding: 10px;
+  padding: 12px;
   font-size: 16px;
   background-color: #333;
-  color: #fff;
-  border: 1px solid #007bff;
-  border-radius: 5px;
-  width: 100%; /* 输入框宽度为容器宽度 */
+  color: #ffffff;
+  border: 1px solid #00d4ff; /* 亮蓝色边框 */
+  border-radius: 6px;
+  width: 100%;
   margin-top: 10px;
-  box-sizing: border-box; /* 包括内边距和边框 */
+  box-sizing: border-box;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.6); /* 内阴影效果 */
 }
 
-.short-input {
-  width: 100%; /* 保持输入框宽度与容器一致 */
+.vert-input:hover, .vert-input:focus {
+  border-color: #00aaff;
+  outline: none;
+  box-shadow: 0 0 10px #00d4ff; /* 悬停和聚焦时外部发光效果 */
 }
 
+/* Button styles */
 .purchase-button, .mining-button, .claim-button, .short-button {
-  padding: 12px;
+  padding: 14px;
   font-size: 16px;
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 6px;
   cursor: pointer;
-  margin-top: 10px;
-  transition: background-color 0.3s ease;
-  width: 100%; /* 按钮宽度为容器宽度 */
+  margin-top: 12px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+  width: 100%;
 }
 
 .purchase-button, .mining-button {
-  background-color: #28a745;
+  background: linear-gradient(135deg, #00e676, #00c853); /* 渐变绿色按钮 */
 }
 
 .purchase-button:hover, .mining-button:hover {
-  background-color: #218838;
+  background: linear-gradient(135deg, #00c853, #009d3a); /* 悬停时颜色加深 */
+  transform: translateY(-3px); /* 悬停时按钮轻微上移 */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* 按钮发光阴影 */
 }
 
+/* Paragraph and price info */
 p {
   margin-top: 20px;
-  font-size: 14px;
+  font-size: 15px;
+  color: #e0e0e0;
 }
 
 .price-info {
   margin-top: 10px;
-  font-size: 12px;
-  color: #ccc; /* 使用较浅的颜色来显示说明文字 */
+  font-size: 13px;
+  color: #bbbbbb;
 }
 
+/* Arrow style */
 .arrow-down {
   text-align: center;
-  font-size: 24px;
-  color: #00d4ff;
+  font-size: 26px;
+  color: #77c7ff;
   margin: 15px 0;
+  animation: bounce 2s infinite; /* 添加轻微的上下弹跳动画 */
 }
 
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Expected income text */
 .expected-income {
-  font-size: 14px;
-  color: #b0b0b0;
+  font-size: 15px;
+  color: #9c9c9c;
   margin-bottom: 5px;
 }
 
@@ -86,19 +112,22 @@ p {
   color: #ffffff;
 }
 
-/* 挖矿区域的优化样式 */
+/* Mining section title */
 .mining-section h2 {
   margin-bottom: 15px;
   font-size: 24px;
-  color: #00d4ff;
+  color: #00d4ff; /* 亮蓝色标题 */
+  text-shadow: 0 0 8px #00d4ff; /* 增加发光效果 */
 }
 
+/* Mining section text */
 .mining-section p {
   margin-bottom: 10px;
   font-size: 16px;
   color: #cfcfcf;
 }
 
+/* Staking action buttons */
 .staking-actions {
   display: flex;
   gap: 10px;
@@ -107,78 +136,97 @@ p {
   margin-bottom: 15px;
 }
 
-.vert-input:focus {
-  border-color: #00d4ff;
-  outline: none;
-}
-
+/* Short button style */
 .short-button {
-  background-color: #00aaff;
-  border: none;
-  color: #ffffff;
-  padding: 10px 20px;
-  border-radius: 5px;
+  background: linear-gradient(135deg, #007acc, #005b9f); /* 渐变蓝色按钮 */
+  padding: 12px 20px;
+  border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
 }
 
 .short-button:hover {
-  background-color: #0088cc;
+  background: linear-gradient(135deg, #005b9f, #003c72); /* 悬停时颜色变化 */
+  transform: translateY(-3px); /* 悬停时按钮轻微上移 */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* 按钮发光阴影 */
 }
 
+/* Claim button */
 .claim-button {
-  background-color: #00ff00;
+  background: linear-gradient(135deg, #00e676, #00c853); /* 渐变绿色 */
   color: #000000;
-  padding: 10px 20px;
-  border-radius: 5px;
-  border: none;
+  padding: 12px 20px;
+  border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
-  width: 100%;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
 }
 
 .claim-button:hover {
-  background-color: #00cc00;
+  background: linear-gradient(135deg, #00c853, #009d3a); /* 悬停时颜色加深 */
+  transform: translateY(-3px); /* 悬停时按钮轻微上移 */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* 按钮发光阴影 */
 }
 
-.stake-button,
-.unstake-button {
+.stake-button, .unstake-button {
   flex: 1;
 }
 
-/* 机构代码部分的样式 */
+/* Institution section */
 .institution-section {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-  gap: 10px; /* 输入框和按钮之间的间距 */
-  flex-wrap: wrap; /* 使其在小屏幕上可以换行 */
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
+/* Institution input */
 .institution-input {
-  padding: 10px;
-  border: 2px solid #007bff;
-  border-radius: 5px;
+  padding: 12px;
+  border: 2px solid #00d4ff;
+  border-radius: 6px;
   font-size: 16px;
-  flex: 1; /* 输入框占据剩余空间 */
-  background-color: #292929;
+  flex: 1;
+  background-color: #3b3b3d;
   color: #ffffff;
   box-sizing: border-box;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.6); /* 输入框内阴影 */
 }
 
+.institution-input:focus {
+  border-color: #77c7ff;
+  box-shadow: 0 0 10px #00d4ff; /* 聚焦时发光效果 */
+}
+
+/* Apply button */
 .apply-button {
-  padding: 10px 20px;
-  background-color: #007bff;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #007acc, #005b9f); /* 渐变蓝色按钮 */
   border: none;
   color: white;
   cursor: pointer;
-  border-radius: 5px;
+  border-radius: 6px;
   font-size: 16px;
-  transition: background-color 0.3s ease;
-  flex-shrink: 0; /* 按钮不随输入框缩放 */
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+  flex-shrink: 0;
 }
 
 .apply-button:hover {
-  background-color: #0056b3;
+  background: linear-gradient(135deg, #005b9f, #003c72);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive styling for small screens */
+@media (max-width: 480px) {
+  .institution-section {
+    flex-direction: column;
+  }
+
+  .apply-button {
+    width: 100%;
+    margin-top: 10px;
+  }
 }

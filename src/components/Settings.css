@@ -1,132 +1,87 @@
 /* Container settings */
 .settings-container {
-  padding: 20px;
-  background-color: #1f1f1f;
+  padding: 25px;
+  background: linear-gradient(135deg, #1b1b1b, #333); /* 渐变背景 */
   color: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5); /* 更加鲜明的阴影效果 */
   max-width: 600px;
   margin: 0 auto;
   text-align: center;
-  font-family: 'Arial', sans-serif;
+  font-family: 'Roboto', sans-serif; /* 更现代的字体 */
+  border: 1px solid #444; /* 增加深色边框 */
 }
 
 /* Titles and headings */
 .settings-title {
-  font-size: 28px;
-  margin-bottom: 20px;
-  color: #f0f0f0;
+  font-size: 32px;
+  margin-bottom: 25px;
+  color: #e0e0e0; /* 浅色的标题文字 */
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.2px;
+  text-shadow: 0 0 8px #00d4ff; /* 发光效果 */
 }
 
 .section-title {
-  font-size: 22px;
-  margin-bottom: 10px;
-  color: #32cd32;
-}
-
-/* Pre-sale section */
-.presale-section {
-  margin-bottom: 30px;
-  background-color: #2a2a2a;
-  border-radius: 10px;
-  padding: 20px;
-}
-
-.countdown-text {
-  font-size: 18px;
-  margin-bottom: 20px;
-  color: #f0f0f0;
-  font-weight: bold;
-}
-
-/* Progress bar */
-.progress-bar-container {
-  background-color: #444;
-  border-radius: 20px;
-  width: 100%;
-  height: 30px;
-  overflow: hidden;
-  margin: 20px 0;
-  position: relative;
-  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
-}
-
-.progress-bar {
-  height: 100%;
-  background: linear-gradient(90deg, #32cd32, #7cfc00);
-  background-size: 200% 100%;
-  animation: move-left 2s linear infinite;
-  transition: width 1s ease-in-out;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 20px;
-}
-
-@keyframes move-left {
-  0% { background-position: 200% 0; }
-  100% { background-position: 0 0; }
-}
-
-.progress-text {
-  font-size: 16px;
-  font-weight: bold;
-  color: #ffffff;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
-}
-
-.progress-info {
-  margin-top: 10px;
-  font-size: 16px;
-  color: #f0f0f0;
+  font-size: 24px;
+  margin-bottom: 12px;
+  color: #00ff7f; /* 亮绿色标题 */
+  text-shadow: 0 0 8px #00ff7f; /* 增加发光效果 */
 }
 
 /* Conversion section */
 .conversion-input-group {
   display: flex;
-  flex-direction: column; /* 将布局改为纵向 */
-  gap: 10px; /* 控制输入框和按钮之间的间距 */
-  margin-top: 20px;
+  flex-direction: column;
+  gap: 12px; /* 输入框和按钮之间的间距 */
+  margin-top: 25px;
 }
 
 .vert-input {
-  width: 100%; /* 输入框宽度设置为占满父容器 */
-  font-size: 16px;
-  padding: 10px;
-  height: 40px; /* 设置输入框的高度 */
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  box-sizing: border-box; /* 确保 padding 和宽度计算正确 */
+  width: 100%;
+  font-size: 17px;
+  padding: 12px;
+  height: 45px;
+  border: 1px solid #00d4ff; /* 蓝色边框 */
+  border-radius: 6px;
+  background-color: #222; /* 深灰色背景 */
+  color: #ffffff;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.6); /* 内阴影效果 */
+}
+
+.vert-input:focus {
+  border-color: #00d4ff;
+  outline: none;
+  box-shadow: 0 0 10px #00d4ff; /* 聚焦时增加外部发光 */
 }
 
 /* Buttons */
 .action-button, .explain-button {
-  padding: 12px 20px;
-  width: 100%; /* 按钮与输入框一样宽 */
-  height: 40px; /* 确保按钮高度与输入框一致 */
-  background-color: #00d4ff;
+  padding: 14px 22px;
+  width: 100%;
+  height: 45px;
+  background: linear-gradient(135deg, #00d4ff, #007bff); /* 渐变按钮 */
   color: #fff;
   border: none;
   cursor: pointer;
-  font-size: 16px;
-  border-radius: 5px;
-  white-space: nowrap; /* 确保按钮内容不换行 */
-  box-sizing: border-box; /* 确保 padding 和边框在计算内 */
+  font-size: 17px;
+  border-radius: 6px;
   display: flex;
-  align-items: center; /* 按钮内部文字垂直居中 */
-  justify-content: center; /* 按钮内部文字水平居中 */
-  transition: background-color 0.3s ease; /* 平滑过渡效果 */
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .action-button:hover, .explain-button:hover {
-  background-color: #00aaff; /* 悬停时的背景颜色 */
+  background: linear-gradient(135deg, #00aaff, #0056b3);
+  transform: translateY(-2px);
+  box-shadow: 0 0 10px #00aaff; /* 悬停时发光效果 */
 }
 
 .action-button:disabled {
-  background-color: #888;
+  background-color: #666;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
 /* Button group */
@@ -134,14 +89,66 @@
   display: flex;
   justify-content: space-around;
   flex-wrap: wrap;
-  margin-top: 20px;
-  gap: 10px;
+  margin-top: 25px;
+  gap: 12px; /* 按钮之间的间距 */
+}
+
+/* Invitation section */
+.invite-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #222; /* 深色背景 */
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* 更加立体的阴影 */
+  margin-top: 30px;
+}
+
+.invite-input {
+  flex: 3;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid #00d4ff;
+  background-color: #333;
+  color: #ffffff;
+  margin-right: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.6); /* 内阴影 */
+}
+
+.copy-button {
+  flex: 1;
+  padding: 12px 20px;
+  background-color: #28a745;
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.copy-button:hover {
+  background-color: #218838;
+  transform: translateY(-2px);
+  box-shadow: 0 0 10px #28a745; /* 悬停时发光效果 */
+}
+
+.copy-success {
+  color: #32cd32;
+  font-size: 14px;
+  margin-top: 10px;
 }
 
 /* Explain section */
 .explain-section {
   text-align: center;
-  margin-top: 20px;
+  margin-top: 25px;
+  color: #c0c0c0;
 }
 
 /* Modal styling */
@@ -151,7 +158,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.7); /* 更深的遮罩层 */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -159,36 +166,44 @@
 }
 
 .modal-content {
-  background-color: #ffffff;
-  padding: 20px;
-  border-radius: 10px;
+  background-color: #222;
+  padding: 25px;
+  border-radius: 12px;
   max-width: 600px;
   width: 100%;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  color: #333;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6);
+  color: #ffffff;
   position: relative;
+  border: 1px solid #00d4ff; /* 蓝色发光边框 */
 }
 
 .modal-close {
   position: absolute;
   top: 10px;
   right: 10px;
-  font-size: 24px;
+  font-size: 26px;
   cursor: pointer;
+  color: #ff4d4d;
 }
 
 .modal-close:hover {
-  color: red;
+  color: #ff1a1a;
+  text-shadow: 0 0 10px #ff4d4d; /* 悬停时发光效果 */
 }
 
 /* Responsive styling for small screens */
 @media (max-width: 480px) {
+  .invite-section {
+    flex-direction: column;
+    gap: 10px;
+  }
+
   .button-group {
     flex-direction: column;
   }
 
   .action-button, .explain-button {
     width: 100%;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
   }
 }

@@ -4,6 +4,7 @@ import Web3 from 'web3';
 import Home from './components/Home';
 import Team from './components/Team';
 import Settings from './components/Settings';
+import Mining from './components/Mining'; // 引入Mining组件
 import Footer from './components/Footer';
 import Logo from './components/Logo';
 
@@ -61,6 +62,7 @@ const App = () => {
         <div style={styles.content}>
           <Routes>
             <Route path="/" element={<Home account={account} web3={web3} contract={contract} />} />
+            <Route path="/mining" element={<Mining account={account} web3={web3} contract={contract} />} />
             <Route path="/team" element={<Team account={account} web3={web3} contract={contract} />} />
             <Route path="/settings" element={<Settings account={account} web3={web3} contract={contract} />} />
           </Routes>
