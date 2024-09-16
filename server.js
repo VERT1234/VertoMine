@@ -1,11 +1,11 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
-const Web3 = require('web3').default;  // 使用 .default 修正导入
+const Web3 = require('web3').default;
 
 // 初始化Web3，连接到BSC网络
 const web3 = new Web3(process.env.BSC_PROVIDER || "https://bsc-dataseed.binance.org/");
-const contractABI = [
+const contractABI = [ 
   {"inputs":[],"stateMutability":"nonpayable","type":"constructor"},
   {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},
   {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},
@@ -35,32 +35,43 @@ const contractABI = [
   {"inputs":[{"internalType":"address","name":"sender","type":"address"},{"internalType":"address","name":"recipient","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},
   {"inputs":[{"internalType":"uint256","name":"_index","type":"uint256"}],"name":"unstakeTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},
   {"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"withdrawBNB","outputs":[],"stateMutability":"nonpayable","type":"function"},
-  {"stateMutability":"payable","type":"receive"}
-]; 
+  {"stateMutability":"payable","type":"receive"} 
+  ];
 const contractAddress = process.env.CONTRACT_ADDRESS;
 const contract = new web3.eth.Contract(contractABI, contractAddress);
 
 app.use(cors());
 app.use(express.json());
 
+// 使用内存存储钱包挖矿时间的数据库
 const miningTimes = {}; // { 'walletAddress': 'lastMiningTimeInMs' }
 
 // 路由：检查是否允许挖矿
 app.get('/canMine/:wallet', (req, res) => {
   const wallet = req.params.wallet;
+  
+  // 获取最后的挖矿时间 (以毫秒为单位，记录 UTC 时间戳)
   const lastMiningTime = miningTimes[wallet] || 0;
-  const currentTime = Date.now();
-  const canMine = (currentTime - lastMiningTime) >= 24 * 60 * 60 * 1000; // 24小时限制
-
+  
+  // 获取当前 UTC 时间（以毫秒计）
+  const currentTime = new Date().getTime();
+  
+  // 计算是否超过24小时
+  const canMine = (currentTime - lastMiningTime) >= 24 * 60 * 60 * 1000; // 24小时
+  
   res.json({ canMine });
 });
 
 // 路由：更新钱包的挖矿时间
 app.post('/updateMiningTime/:wallet', (req, res) => {
   const wallet = req.params.wallet;
-  const currentTime = Date.now();
-
-  miningTimes[wallet] = currentTime; // 更新最后挖矿时间
+  
+  // 获取当前 UTC 时间戳
+  const currentTime = new Date().getTime();
+  
+  // 更新挖矿时间，记录为 UTC 毫秒时间戳
+  miningTimes[wallet] = currentTime;
+  
   res.json({ success: true, lastMiningTime: currentTime });
 });
 
@@ -72,7 +83,7 @@ app.post('/withdrawTokens/:wallet', async (req, res) => {
   try {
     // 调用合约中的 distributeTokens 函数，将生成的代币发送到用户的钱包
     await contract.methods.distributeTokens(wallet, web3.utils.toWei(amount.toString(), 'ether')).send({
-      from: '0xAD86b74203239E1a6c2EF7C7620df81cf1365aDb', // 合约钱包需要有足够的代币
+      from: '0xEd7ac42dEc44E256A5Ab6fB30686c4695F72E726', // 合约钱包需要有足够的代币
       gas: 3000000
     });
 
