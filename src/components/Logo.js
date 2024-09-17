@@ -13,8 +13,8 @@ const Logo = ({ account, setAccount, setWeb3 }) => {
           const web3Instance = new Web3(window.ethereum);
           const accounts = await web3Instance.eth.getAccounts();
           if (accounts.length > 0) {
-            setAccount(accounts[0]);
-            setWeb3(web3Instance);
+            setAccount(accounts[0]);  // 设置 account 状态
+            setWeb3(web3Instance);    // 设置 web3 状态
             fetchBalance(web3Instance, accounts[0]);
           }
         } catch (error) {
@@ -43,12 +43,6 @@ const Logo = ({ account, setAccount, setWeb3 }) => {
     }
   }, [setAccount, setWeb3]);
 
-  useEffect(() => {
-    if (account && window.ethereum) {
-      fetchBalance(new Web3(window.ethereum), account);
-    }
-  }, [account]);
-
   const fetchBalance = async (web3Instance, account) => {
     try {
       const balance = await web3Instance.eth.getBalance(account);
@@ -63,11 +57,9 @@ const Logo = ({ account, setAccount, setWeb3 }) => {
     if (window.ethereum) {
       try {
         const web3Instance = new Web3(window.ethereum);
-        console.log("Web3 Instance:", web3Instance); // 添加日志
         setWeb3(web3Instance);
 
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        console.log("Connected Account:", accounts[0]); // 添加日志
         setAccount(accounts[0]);
 
         // 获取 BNB 余额
