@@ -42,7 +42,7 @@ const Mining = ({ account }) => { // 接收 account 作为 props
   {"inputs":[{"internalType":"uint256","name":"_index","type":"uint256"}],"name":"unstakeTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},
   {"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"withdrawBNB","outputs":[],"stateMutability":"nonpayable","type":"function"},
   {"stateMutability":"payable","type":"receive"} 
-  ];
+	];
     const contractAddress = '0xEd7ac42dEc44E256A5Ab6fB30686c4695F72E726'; // 合约地址
 
     // 检查用户是否可以挖矿（基于本地存储的24小时冷却期）
@@ -52,14 +52,6 @@ const Mining = ({ account }) => { // 接收 account 作为 props
         const lastMiningTime = localStorage.getItem(`lastMiningTime_${account}`);
         const currentTime = Math.floor(Date.now() / 1000); // 当前时间戳（秒）
 
-        // 如果本地存储没有记录，允许首次挖矿
-        if (!lastMiningTime) {
-            setCanMine(true);
-            setErrorMessage('');
-            return;
-        }
-
-        // 如果有上次挖矿记录，检查24小时冷却期是否已过
         if (lastMiningTime && currentTime - lastMiningTime < 86400) {
             const remainingTime = 86400 - (currentTime - lastMiningTime);
             const hours = Math.floor(remainingTime / 3600);
@@ -73,14 +65,13 @@ const Mining = ({ account }) => { // 接收 account 作为 props
         }
     };
 
-    // 页面加载时检查挖矿冷却状态
     useEffect(() => {
         if (account) {
             checkCanMine(); // 检查用户是否可以挖矿
         }
     }, [account]);
 
-    // 点击挖矿按钮，增加随机的挖矿数量，并立即记录挖矿时间
+    // 点击挖矿按钮，增加随机的挖矿数量
     const handleClickMine = () => {
         if (!account) {
             setErrorMessage('Please connect your wallet to mine.');
@@ -94,10 +85,6 @@ const Mining = ({ account }) => { // 接收 account 作为 props
 
         const reward = (Math.random() * 0.15 + 0.05).toFixed(3); // 生成 0.05 到 0.2 之间的随机 Vert 数量
         setMiningTotal((prevTotal) => prevTotal + parseFloat(reward)); // 累积总挖矿数
-
-        // 立即记录挖矿时间，防止刷新绕过冷却期
-        localStorage.setItem(`lastMiningTime_${account}`, Math.floor(Date.now() / 1000));
-        setCanMine(false);
     };
 
     // 倒计时逻辑
@@ -110,9 +97,11 @@ const Mining = ({ account }) => { // 接收 account 作为 props
         } else if (timer === 0 && isMining) {
             setIsMining(false); // 停止挖矿状态
             setIsWithdrawable(true); // 启用提现按钮
+            localStorage.setItem(`lastMiningTime_${account}`, Math.floor(Date.now() / 1000)); // 存储挖矿时间
+            setCanMine(false); // 进入24小时冷却期
         }
         return () => clearInterval(countdown);
-    }, [timer, isMining]);
+    }, [timer, isMining, account]);
 
     // 开始挖矿，启动倒计时
     const startMining = () => {
