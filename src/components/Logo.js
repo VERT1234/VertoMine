@@ -4,9 +4,9 @@ import './Logo.css';
 import logo from '../assets/logo.png'; // 主Logo
 
 const supportedChains = {
-  '0x1': 'Ethereum Mainnet',
-  '0x38': 'Binance Smart Chain',
-  '0x89': 'Polygon',
+  '0x1': { name: 'Ethereum', logo: 'https://cryptologos.cc/logos/ethereum-eth-logo.png' },
+  '0x38': { name: 'Binance Smart Chain', logo: 'https://cryptologos.cc/logos/binance-coin-bnb-logo.png' },
+  '0x89': { name: 'Polygon', logo: 'https://cryptologos.cc/logos/polygon-matic-logo.png' },
   // 可以根据需要添加其他支持的链
 };
 
@@ -14,9 +14,11 @@ const Logo = ({ account, setAccount, setWeb3 }) => {
   const [bnbBalance, setBnbBalance] = useState('Loading...');
   const [networkLogo, setNetworkLogo] = useState(null);
   const [isConnecting, setIsConnecting] = useState(false);
-  const [showChainOptions, setShowChainOptions] = useState(false);
-  const [availableChains, setAvailableChains] = useState([]);
+  const [showModal, setShowModal] = useState(false); // 控制模态框显示
+  const [availableChains, setAvailableChains] = useState(Object.keys(supportedChains));
   const [availableAccounts, setAvailableAccounts] = useState([]);
+  const [selectedChainId, setSelectedChainId] = useState(null);
+  const [noAccountsFound, setNoAccountsFound] = useState(false); // 标记是否找不到账户
 
   useEffect(() => {
     const checkConnectedWallet = async () => {
@@ -82,13 +84,8 @@ const Logo = ({ account, setAccount, setWeb3 }) => {
   };
 
   const fetchNetworkLogo = (chainId) => {
-    const logos = {
-      '0x1': 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
-      '0x38': 'https://cryptologos.cc/logos/binance-coin-bnb-logo.png',
-      '0x89': 'https://cryptologos.cc/logos/polygon-matic-logo.png',
-    };
-    const logoUrl = logos[chainId];
-    setNetworkLogo(logoUrl ? logoUrl : null); // 如果找不到Logo，设置为null
+    const chainInfo = supportedChains[chainId];
+    setNetworkLogo(chainInfo ? chainInfo.logo : null); // 如果找不到Logo，设置为null
   };
 
   const connectWallet = async () => {
@@ -98,17 +95,15 @@ const Logo = ({ account, setAccount, setWeb3 }) => {
         const web3Instance = new Web3(window.ethereum);
         setWeb3(web3Instance);
 
-        // 获取可用的链和账户
-        const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+        // 获取账户和链信息
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
 
-        // 如果有可用账户，显示选择框
         if (accounts.length > 0) {
-          setAvailableChains([chainId]); // 假设目前只有一个链可用
-          setAvailableAccounts(accounts); // 显示可用的账户
-          setShowChainOptions(true); // 显示链和账户选择框
+          setAvailableAccounts(accounts); // 存储可用账户
+          setShowModal(true); // 显示模态框
+          setNoAccountsFound(false); // 重置找不到账户的标记
         } else {
-          alert('No accounts found.');
+          setNoAccountsFound(true); // 标记找不到账户
         }
       } catch (error) {
         console.error('Failed to connect wallet', error);
@@ -122,11 +117,11 @@ const Logo = ({ account, setAccount, setWeb3 }) => {
 
   const handleChainSelect = async (selectedChainId) => {
     try {
+      setSelectedChainId(selectedChainId);
       await window.ethereum.request({
         method: 'wallet_switchEthereumChain',
         params: [{ chainId: selectedChainId }],
       });
-      setShowChainOptions(false); // 隐藏选择框
       fetchNetworkLogo(selectedChainId);
     } catch (switchError) {
       console.error('Failed to switch chain', switchError);
@@ -135,7 +130,7 @@ const Logo = ({ account, setAccount, setWeb3 }) => {
 
   const handleAccountSelect = (selectedAccount) => {
     setAccount(selectedAccount);
-    setShowChainOptions(false); // 隐藏选择框
+    setShowModal(false); // 隐藏模态框
   };
 
   const disconnectWallet = () => {
@@ -164,20 +159,39 @@ const Logo = ({ account, setAccount, setWeb3 }) => {
             {isConnecting ? 'Connecting...' : 'Connect Wallet'}
           </button>
 
-          {showChainOptions && (
-            <div className="chain-options">
-              <h3>Select a Chain</h3>
-              {availableChains.map((chainId) => (
-                <button key={chainId} onClick={() => handleChainSelect(chainId)}>
-                  {supportedChains[chainId] || `Chain ID: ${chainId}`}
-                </button>
-              ))}
-              <h3>Select an Account</h3>
-              {availableAccounts.map((acc) => (
-                <button key={acc} onClick={() => handleAccountSelect(acc)}>
-                  {acc.slice(0, 6)}...{acc.slice(-4)}
-                </button>
-              ))}
+          {noAccountsFound && (
+            <p style={{ color: 'red' }}>未找到账户，请先连接钱包。</p>
+          )}
+
+          {showModal && (
+            <div className="modal">
+              <div className="modal-content">
+                {!selectedChainId ? (
+                  <>
+                    <h3>Select a Chain</h3>
+                    <div className="chain-options">
+                      {availableChains.map((chainId) => (
+                        <div key={chainId} className="chain-option" onClick={() => handleChainSelect(chainId)}>
+                          <img src={supportedChains[chainId].logo} alt={supportedChains[chainId].name} className="chain-logo" />
+                          <span>{supportedChains[chainId].name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <h3>Select an Account</h3>
+                    <div className="account-options">
+                      {availableAccounts.map((acc) => (
+                        <div key={acc} className="account-option" onClick={() => handleAccountSelect(acc)}>
+                          {acc.slice(0, 6)}...{acc.slice(-4)}
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+                <button className="close-button" onClick={() => setShowModal(false)}>Close</button>
+              </div>
             </div>
           )}
         </div>
