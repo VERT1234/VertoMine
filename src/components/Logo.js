@@ -7,7 +7,7 @@ const supportedChains = {
   '0x1': { name: 'Ethereum', logo: 'https://cryptologos.cc/logos/ethereum-eth-logo.png' },
   '0x38': { name: 'Binance Smart Chain', logo: 'https://cryptologos.cc/logos/binance-coin-bnb-logo.png' },
   '0x89': { name: 'Polygon', logo: 'https://cryptologos.cc/logos/polygon-matic-logo.png' },
-  // 其他链可以根据需要添加
+  // 可以根据需要添加其他支持的链
 };
 
 const Logo = ({ account, setAccount, setWeb3 }) => {
@@ -23,20 +23,20 @@ const Logo = ({ account, setAccount, setWeb3 }) => {
   // 适配多个Web3提供者
   const detectProvider = () => {
     let provider;
-    if (window.ethereum) {
+    // 优先检测 Binance Chain
+    if (window.BinanceChain) {
+      provider = window.BinanceChain;
+      console.log('Detected Binance Wallet');
+      window.BinanceChain.autoRefreshOnNetworkChange = false; // 禁止自动刷新
+    } else if (window.ethereum) {
       provider = window.ethereum;
 
-      // 检测特定钱包
+      // 检测 MetaMask 和其他钱包
       if (provider.isMetaMask) {
         console.log('Detected MetaMask');
-      } else if (provider.isBinanceChain) {
-        console.log('Detected Binance Wallet');
       } else if (provider.isOkxWallet) {
         console.log('Detected OKX Wallet');
       }
-    } else if (window.BinanceChain) {
-      provider = window.BinanceChain;
-      console.log('Detected Binance Wallet');
     } else {
       provider = null;
       alert('Please install a Web3 wallet (MetaMask, Binance Wallet, OKX Wallet).');
@@ -65,12 +65,12 @@ const Logo = ({ account, setAccount, setWeb3 }) => {
 
     checkConnectedWallet();
 
-    if (window.ethereum) {
+    if (window.ethereum || window.BinanceChain) {
       const handleAccountsChanged = (accounts) => {
         if (accounts.length > 0) {
           setAccount(accounts[0]);
-          fetchBalance(new Web3(window.ethereum), accounts[0]);
-          fetchNetworkLogo(window.ethereum.chainId); // 更新网络Logo
+          fetchBalance(new Web3(window.ethereum || window.BinanceChain), accounts[0]);
+          fetchNetworkLogo(window.ethereum ? window.ethereum.chainId : window.BinanceChain.chainId); // 更新网络Logo
         } else {
           disconnectWallet();
         }
@@ -78,23 +78,27 @@ const Logo = ({ account, setAccount, setWeb3 }) => {
 
       const handleChainChanged = (chainId) => {
         fetchNetworkLogo(chainId);
-        window.location.reload();
+        // 切换网络后，只有必要时才重新加载页面，避免无限刷新
+        if (window.ethereum || window.BinanceChain) {
+          window.location.reload();
+        }
       };
 
-      window.ethereum.on('accountsChanged', handleAccountsChanged);
-      window.ethereum.on('chainChanged', handleChainChanged);
+      // 监听账户变化和链变化
+      (window.ethereum || window.BinanceChain)?.on('accountsChanged', handleAccountsChanged);
+      (window.ethereum || window.BinanceChain)?.on('chainChanged', handleChainChanged);
 
       return () => {
-        window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
-        window.ethereum.removeListener('chainChanged', handleChainChanged);
+        (window.ethereum || window.BinanceChain)?.removeListener('accountsChanged', handleAccountsChanged);
+        (window.ethereum || window.BinanceChain)?.removeListener('chainChanged', handleChainChanged);
       };
     }
   }, [setAccount, setWeb3]);
 
   useEffect(() => {
-    if (account && window.ethereum) {
-      fetchBalance(new Web3(window.ethereum), account);
-      fetchNetworkLogo(window.ethereum.chainId); // 设置网络Logo
+    if (account && (window.ethereum || window.BinanceChain)) {
+      fetchBalance(new Web3(window.ethereum || window.BinanceChain), account);
+      fetchNetworkLogo((window.ethereum ? window.ethereum.chainId : window.BinanceChain.chainId)); // 设置网络Logo
     }
   }, [account]);
 
@@ -143,7 +147,7 @@ const Logo = ({ account, setAccount, setWeb3 }) => {
   const handleChainSelect = async (selectedChainId) => {
     try {
       setSelectedChainId(selectedChainId);
-      await window.ethereum.request({
+      await (window.ethereum || window.BinanceChain).request({
         method: 'wallet_switchEthereumChain',
         params: [{ chainId: selectedChainId }],
       });
