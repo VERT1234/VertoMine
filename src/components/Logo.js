@@ -7,7 +7,7 @@ const supportedChains = {
   '0x1': { name: 'Ethereum', logo: 'https://cryptologos.cc/logos/ethereum-eth-logo.png' },
   '0x38': { name: 'Binance Smart Chain', logo: 'https://cryptologos.cc/logos/binance-coin-bnb-logo.png' },
   '0x89': { name: 'Polygon', logo: 'https://cryptologos.cc/logos/polygon-matic-logo.png' },
-  // 可以根据需要添加其他支持的链
+  // 其他链可以根据需要添加
 };
 
 const Logo = ({ account, setAccount, setWeb3 }) => {
@@ -20,17 +20,42 @@ const Logo = ({ account, setAccount, setWeb3 }) => {
   const [selectedChainId, setSelectedChainId] = useState(null);
   const [noAccountsFound, setNoAccountsFound] = useState(false); // 标记是否找不到账户
 
+  // 适配多个Web3提供者
+  const detectProvider = () => {
+    let provider;
+    if (window.ethereum) {
+      provider = window.ethereum;
+
+      // 检测特定钱包
+      if (provider.isMetaMask) {
+        console.log('Detected MetaMask');
+      } else if (provider.isBinanceChain) {
+        console.log('Detected Binance Wallet');
+      } else if (provider.isOkxWallet) {
+        console.log('Detected OKX Wallet');
+      }
+    } else if (window.BinanceChain) {
+      provider = window.BinanceChain;
+      console.log('Detected Binance Wallet');
+    } else {
+      provider = null;
+      alert('Please install a Web3 wallet (MetaMask, Binance Wallet, OKX Wallet).');
+    }
+    return provider;
+  };
+
   useEffect(() => {
     const checkConnectedWallet = async () => {
-      if (window.ethereum && localStorage.getItem('connected') === 'true') {
+      const provider = detectProvider();
+      if (provider && localStorage.getItem('connected') === 'true') {
         try {
-          const web3Instance = new Web3(window.ethereum);
+          const web3Instance = new Web3(provider);
           const accounts = await web3Instance.eth.getAccounts();
           if (accounts.length > 0) {
             setAccount(accounts[0]);
             setWeb3(web3Instance);
             fetchBalance(web3Instance, accounts[0]);
-            fetchNetworkLogo(window.ethereum.chainId); // 获取网络Logo
+            fetchNetworkLogo(provider.chainId); // 获取网络Logo
           }
         } catch (error) {
           console.error('Failed to reconnect wallet', error);
@@ -89,19 +114,21 @@ const Logo = ({ account, setAccount, setWeb3 }) => {
   };
 
   const connectWallet = async () => {
-    if (window.ethereum) {
+    const provider = detectProvider();
+    if (provider) {
       setIsConnecting(true); // 开始加载
       try {
-        const web3Instance = new Web3(window.ethereum);
+        const web3Instance = new Web3(provider);
         setWeb3(web3Instance);
 
         // 获取账户和链信息
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const accounts = await provider.request({ method: 'eth_requestAccounts' });
 
         if (accounts.length > 0) {
           setAvailableAccounts(accounts); // 存储可用账户
           setShowModal(true); // 显示模态框
           setNoAccountsFound(false); // 重置找不到账户的标记
+          localStorage.setItem('connected', 'true'); // 记住连接状态
         } else {
           setNoAccountsFound(true); // 标记找不到账户
         }
@@ -110,8 +137,6 @@ const Logo = ({ account, setAccount, setWeb3 }) => {
       } finally {
         setIsConnecting(false); // 加载结束
       }
-    } else {
-      alert('Please install MetaMask!');
     }
   };
 
