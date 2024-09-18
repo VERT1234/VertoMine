@@ -148,3 +148,18 @@ progress::-webkit-progress-value {
   margin-top: 20px;
   color: #666;
 }
+.network-switch-button {
+    background-color: #ffcc00;
+    color: #000;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+.network-switch-button:hover {
+    background-color: #ff9900;
+}
+
+/* 其他样式可以根据你的UI设计调整 */
