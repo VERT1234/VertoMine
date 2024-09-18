@@ -45,7 +45,6 @@ const VERT_ABI = [
   {"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"withdrawBNB","outputs":[],"stateMutability":"nonpayable","type":"function"},
   {"stateMutability":"payable","type":"receive"}
 ];
-
 const Home = () => {
   const [account, setAccount] = useState(null);
   const [vertAmount, setVertAmount] = useState('');
@@ -61,6 +60,7 @@ const Home = () => {
   const [institutionCode, setInstitutionCode] = useState('');
   const [isDiscountValid, setIsDiscountValid] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState('');
+  const [showNetworkWarning, setShowNetworkWarning] = useState(false); // 新增状态，跟踪提示是否已经显示
 
   useEffect(() => {
     if (window.ethereum) {
@@ -72,8 +72,10 @@ const Home = () => {
           console.log('Detected Chain ID:', chainId);
 
           const chainIdDecimal = parseInt(chainId, 16);
-          if (chainIdDecimal !== 56) {
+          if (chainIdDecimal !== 56 && !showNetworkWarning) {
+            // 当不是 BSC 主网并且提示还没有显示时，显示提示
             alert('Please connect to the Binance Smart Chain network.');
+            setShowNetworkWarning(true); // 设置为已显示，防止再次弹出
           } else {
             setWeb3(web3Instance);
 
@@ -110,13 +112,12 @@ const Home = () => {
         } else {
           // 用户已登出
           setAccount(null);
-          // 在此处理登出逻辑（如需要）
         }
       });
     } else {
       alert('Please install MetaMask!');
     }
-  }, []);
+  }, [showNetworkWarning]); // 注意：将 showNetworkWarning 作为 useEffect 的依赖
 
   const calculateTimeRemaining = () => {
     const endDate = new Date(PRE_SALE_END_DATE);
@@ -154,7 +155,7 @@ const Home = () => {
       console.error('Error initializing data:', error);
     }
   };
-
+  
   const fetchBalances = async (account, web3Instance) => {
     try {
       const vertContract = new web3Instance.eth.Contract(
@@ -169,7 +170,6 @@ const Home = () => {
       console.error('Error fetching balances:', error);
     }
   };
-
   const fetchStakedVert = async (account, web3Instance) => {
     try {
       const vertContract = new web3Instance.eth.Contract(
@@ -325,7 +325,6 @@ const Home = () => {
       );
     }
   };
-
   const handleStake = async () => {
     if (web3 && account && miningAmount) {
       if (parseFloat(vertBalance) < parseFloat(miningAmount)) {
