@@ -55,3 +55,27 @@
   margin-right: 10px;
   vertical-align: middle; /* 确保图标与文字对齐 */
 }
+.chain-options {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  background-color: white;
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
+.chain-options h3 {
+  margin: 10px 0;
+}
+
+.chain-options button {
+  margin: 5px;
+  padding: 10px;
+  cursor: pointer;
+  background-color: #f0f0f0;
+  border: none;
+}
+
+.chain-options button:hover {
+  background-color: #ddd;
+}

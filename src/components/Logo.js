@@ -3,22 +3,20 @@ import Web3 from 'web3';
 import './Logo.css';
 import logo from '../assets/logo.png'; // 主Logo
 
-// 网络上的主流链 Logo URL
-const logos = {
-  '0x1': 'https://cryptologos.cc/logos/ethereum-eth-logo.png', // Ethereum 主网
-  '0x38': 'https://cryptologos.cc/logos/binance-coin-bnb-logo.png', // BSC 主网
-  '0x89': 'https://cryptologos.cc/logos/polygon-matic-logo.png', // Polygon 主网
-  '0xa86a': 'https://cryptologos.cc/logos/avalanche-avax-logo.png', // Avalanche 主网
-  '0xfa': 'https://cryptologos.cc/logos/fantom-ftm-logo.png', // Fantom 主网
-  '0x1f': 'https://cryptologos.cc/logos/arbitrum-arb-logo.png', // Arbitrum
-  '0xa4b1': 'https://cryptologos.cc/logos/optimism-op-logo.png', // Optimism
-  '0x2': 'https://cryptologos.cc/logos/solana-sol-logo.png' // Solana
+const supportedChains = {
+  '0x1': 'Ethereum Mainnet',
+  '0x38': 'Binance Smart Chain',
+  '0x89': 'Polygon',
+  // 可以根据需要添加其他支持的链
 };
 
 const Logo = ({ account, setAccount, setWeb3 }) => {
   const [bnbBalance, setBnbBalance] = useState('Loading...');
   const [networkLogo, setNetworkLogo] = useState(null);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [showChainOptions, setShowChainOptions] = useState(false);
+  const [availableChains, setAvailableChains] = useState([]);
+  const [availableAccounts, setAvailableAccounts] = useState([]);
 
   useEffect(() => {
     const checkConnectedWallet = async () => {
@@ -83,8 +81,12 @@ const Logo = ({ account, setAccount, setWeb3 }) => {
     }
   };
 
-  // 根据 chainId 显示网络Logo
   const fetchNetworkLogo = (chainId) => {
+    const logos = {
+      '0x1': 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
+      '0x38': 'https://cryptologos.cc/logos/binance-coin-bnb-logo.png',
+      '0x89': 'https://cryptologos.cc/logos/polygon-matic-logo.png',
+    };
     const logoUrl = logos[chainId];
     setNetworkLogo(logoUrl ? logoUrl : null); // 如果找不到Logo，设置为null
   };
@@ -96,22 +98,44 @@ const Logo = ({ account, setAccount, setWeb3 }) => {
         const web3Instance = new Web3(window.ethereum);
         setWeb3(web3Instance);
 
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        setAccount(accounts[0]);
+        // 获取可用的链和账户
+        const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
 
-        fetchBalance(web3Instance, accounts[0]);
-        fetchNetworkLogo(window.ethereum.chainId); // 设置网络Logo
-
-        localStorage.setItem('connected', 'true');
+        // 如果有可用账户，显示选择框
+        if (accounts.length > 0) {
+          setAvailableChains([chainId]); // 假设目前只有一个链可用
+          setAvailableAccounts(accounts); // 显示可用的账户
+          setShowChainOptions(true); // 显示链和账户选择框
+        } else {
+          alert('No accounts found.');
+        }
       } catch (error) {
         console.error('Failed to connect wallet', error);
-        setBnbBalance('Error');
       } finally {
         setIsConnecting(false); // 加载结束
       }
     } else {
       alert('Please install MetaMask!');
     }
+  };
+
+  const handleChainSelect = async (selectedChainId) => {
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: selectedChainId }],
+      });
+      setShowChainOptions(false); // 隐藏选择框
+      fetchNetworkLogo(selectedChainId);
+    } catch (switchError) {
+      console.error('Failed to switch chain', switchError);
+    }
+  };
+
+  const handleAccountSelect = (selectedAccount) => {
+    setAccount(selectedAccount);
+    setShowChainOptions(false); // 隐藏选择框
   };
 
   const disconnectWallet = () => {
@@ -135,9 +159,28 @@ const Logo = ({ account, setAccount, setWeb3 }) => {
           </button>
         </div>
       ) : (
-        <button className="connect-button" onClick={connectWallet} disabled={isConnecting}>
-          {isConnecting ? 'Connecting...' : 'Connect Wallet'}
-        </button>
+        <div>
+          <button className="connect-button" onClick={connectWallet} disabled={isConnecting}>
+            {isConnecting ? 'Connecting...' : 'Connect Wallet'}
+          </button>
+
+          {showChainOptions && (
+            <div className="chain-options">
+              <h3>Select a Chain</h3>
+              {availableChains.map((chainId) => (
+                <button key={chainId} onClick={() => handleChainSelect(chainId)}>
+                  {supportedChains[chainId] || `Chain ID: ${chainId}`}
+                </button>
+              ))}
+              <h3>Select an Account</h3>
+              {availableAccounts.map((acc) => (
+                <button key={acc} onClick={() => handleAccountSelect(acc)}>
+                  {acc.slice(0, 6)}...{acc.slice(-4)}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
