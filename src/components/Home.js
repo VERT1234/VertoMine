@@ -60,7 +60,6 @@ const Home = () => {
   const [institutionCode, setInstitutionCode] = useState('');
   const [isDiscountValid, setIsDiscountValid] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState('');
-  const [showNetworkWarning, setShowNetworkWarning] = useState(false); // 新增状态，跟踪提示是否已经显示
 
   useEffect(() => {
     if (window.ethereum) {
@@ -69,14 +68,8 @@ const Home = () => {
       window.ethereum
         .request({ method: 'eth_chainId' })
         .then((chainId) => {
-          console.log('Detected Chain ID:', chainId);
-
           const chainIdDecimal = parseInt(chainId, 16);
-          if (chainIdDecimal !== 56 && !showNetworkWarning) {
-            // 当不是 BSC 主网并且提示还没有显示时，显示提示
-            alert('Please connect to the Binance Smart Chain network.');
-            setShowNetworkWarning(true); // 设置为已显示，防止再次弹出
-          } else {
+          if (chainIdDecimal === 56) {
             setWeb3(web3Instance);
 
             // 请求用户账户
@@ -110,14 +103,13 @@ const Home = () => {
           setAccount(accounts[0]);
           initializeData(web3Instance, accounts[0]);
         } else {
-          // 用户已登出
-          setAccount(null);
+          setAccount(null); // 用户已登出
         }
       });
     } else {
       alert('Please install MetaMask!');
     }
-  }, [showNetworkWarning]); // 注意：将 showNetworkWarning 作为 useEffect 的依赖
+  }, []);
 
   const calculateTimeRemaining = () => {
     const endDate = new Date(PRE_SALE_END_DATE);
@@ -155,7 +147,7 @@ const Home = () => {
       console.error('Error initializing data:', error);
     }
   };
-  
+
   const fetchBalances = async (account, web3Instance) => {
     try {
       const vertContract = new web3Instance.eth.Contract(
