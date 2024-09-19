@@ -20,87 +20,17 @@ const Logo = ({ account, setAccount, setWeb3 }) => {
   const [selectedChainId, setSelectedChainId] = useState(null);
   const [noAccountsFound, setNoAccountsFound] = useState(false); // 标记是否找不到账户
 
-  // 适配多个Web3提供者
+  // 检测Web3提供者
   const detectProvider = () => {
-    let provider;
-    // 优先检测 Binance Chain
+    let provider = null;
     if (window.BinanceChain) {
       provider = window.BinanceChain;
-      console.log('Detected Binance Wallet');
-      window.BinanceChain.autoRefreshOnNetworkChange = false; // 禁止自动刷新
+      window.BinanceChain.autoRefreshOnNetworkChange = false;
     } else if (window.ethereum) {
       provider = window.ethereum;
-
-      // 检测 MetaMask 和其他钱包
-      if (provider.isMetaMask) {
-        console.log('Detected MetaMask');
-      } else if (provider.isOkxWallet) {
-        console.log('Detected OKX Wallet');
-      }
-    } else {
-      provider = null;
-      alert('Please install a Web3 wallet (MetaMask, Binance Wallet, OKX Wallet).');
     }
     return provider;
   };
-
-  useEffect(() => {
-    const checkConnectedWallet = async () => {
-      const provider = detectProvider();
-      if (provider && localStorage.getItem('connected') === 'true') {
-        try {
-          const web3Instance = new Web3(provider);
-          const accounts = await web3Instance.eth.getAccounts();
-          if (accounts.length > 0) {
-            setAccount(accounts[0]);
-            setWeb3(web3Instance);
-            fetchBalance(web3Instance, accounts[0]);
-            fetchNetworkLogo(provider.chainId); // 获取网络Logo
-          }
-        } catch (error) {
-          console.error('Failed to reconnect wallet', error);
-        }
-      }
-    };
-
-    checkConnectedWallet();
-
-    if (window.ethereum || window.BinanceChain) {
-      const handleAccountsChanged = (accounts) => {
-        if (accounts.length > 0) {
-          setAccount(accounts[0]);
-          fetchBalance(new Web3(window.ethereum || window.BinanceChain), accounts[0]);
-          fetchNetworkLogo(window.ethereum ? window.ethereum.chainId : window.BinanceChain.chainId); // 更新网络Logo
-        } else {
-          disconnectWallet();
-        }
-      };
-
-      const handleChainChanged = (chainId) => {
-        fetchNetworkLogo(chainId);
-        // 切换网络后，只有必要时才重新加载页面，避免无限刷新
-        if (window.ethereum || window.BinanceChain) {
-          window.location.reload();
-        }
-      };
-
-      // 监听账户变化和链变化
-      (window.ethereum || window.BinanceChain)?.on('accountsChanged', handleAccountsChanged);
-      (window.ethereum || window.BinanceChain)?.on('chainChanged', handleChainChanged);
-
-      return () => {
-        (window.ethereum || window.BinanceChain)?.removeListener('accountsChanged', handleAccountsChanged);
-        (window.ethereum || window.BinanceChain)?.removeListener('chainChanged', handleChainChanged);
-      };
-    }
-  }, [setAccount, setWeb3]);
-
-  useEffect(() => {
-    if (account && (window.ethereum || window.BinanceChain)) {
-      fetchBalance(new Web3(window.ethereum || window.BinanceChain), account);
-      fetchNetworkLogo((window.ethereum ? window.ethereum.chainId : window.BinanceChain.chainId)); // 设置网络Logo
-    }
-  }, [account]);
 
   const fetchBalance = async (web3Instance, account) => {
     try {
@@ -114,33 +44,33 @@ const Logo = ({ account, setAccount, setWeb3 }) => {
 
   const fetchNetworkLogo = (chainId) => {
     const chainInfo = supportedChains[chainId];
-    setNetworkLogo(chainInfo ? chainInfo.logo : null); // 如果找不到Logo，设置为null
+    setNetworkLogo(chainInfo ? chainInfo.logo : null);
   };
 
   const connectWallet = async () => {
     const provider = detectProvider();
     if (provider) {
-      setIsConnecting(true); // 开始加载
+      setIsConnecting(true);
       try {
         const web3Instance = new Web3(provider);
         setWeb3(web3Instance);
-
-        // 获取账户和链信息
         const accounts = await provider.request({ method: 'eth_requestAccounts' });
 
         if (accounts.length > 0) {
-          setAvailableAccounts(accounts); // 存储可用账户
-          setShowModal(true); // 显示模态框
-          setNoAccountsFound(false); // 重置找不到账户的标记
-          localStorage.setItem('connected', 'true'); // 记住连接状态
+          setAvailableAccounts(accounts);
+          setShowModal(true); // 显示模态框，要求选择账户
+          setNoAccountsFound(false);
+          localStorage.setItem('connected', 'true');
         } else {
-          setNoAccountsFound(true); // 标记找不到账户
+          setNoAccountsFound(true);
         }
       } catch (error) {
         console.error('Failed to connect wallet', error);
       } finally {
-        setIsConnecting(false); // 加载结束
+        setIsConnecting(false);
       }
+    } else {
+      alert('Please install a Web3 wallet (MetaMask, Binance Wallet, OKX Wallet).');
     }
   };
 
@@ -160,13 +90,14 @@ const Logo = ({ account, setAccount, setWeb3 }) => {
   const handleAccountSelect = (selectedAccount) => {
     setAccount(selectedAccount);
     setShowModal(false); // 隐藏模态框
+    fetchBalance(new Web3(window.ethereum || window.BinanceChain), selectedAccount);
   };
 
   const disconnectWallet = () => {
     setAccount(null);
     setWeb3(null);
     setBnbBalance('Loading...');
-    setNetworkLogo(null); // 重置网络Logo
+    setNetworkLogo(null);
     localStorage.removeItem('connected');
   };
 
@@ -188,9 +119,7 @@ const Logo = ({ account, setAccount, setWeb3 }) => {
             {isConnecting ? 'Connecting...' : 'Connect Wallet'}
           </button>
 
-          {noAccountsFound && (
-            <p style={{ color: 'red' }}>未找到账户，请先连接钱包。</p>
-          )}
+          {noAccountsFound && <p style={{ color: 'red' }}>未找到账户，请先连接钱包。</p>}
 
           {showModal && (
             <div className="modal">
