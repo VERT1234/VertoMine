@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Web3 from 'web3';
 import BN from 'bn.js'; // 从 'bn.js' 导入 BN
 import axios from 'axios';
 import { fromWei, toWei } from 'web3-utils';
@@ -43,10 +42,10 @@ const VERT_ABI = [
   {"inputs":[{"internalType":"address","name":"sender","type":"address"},{"internalType":"address","name":"recipient","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},
   {"inputs":[{"internalType":"uint256","name":"_index","type":"uint256"}],"name":"unstakeTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},
   {"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"withdrawBNB","outputs":[],"stateMutability":"nonpayable","type":"function"},
-  {"stateMutability":"payable","type":"receive"}
+  {"stateMutability":"payable","type":"receive"} 
 ];
-const Home = () => {
-  const [account, setAccount] = useState(null);
+
+const Home = ({ account, web3 }) => {
   const [vertAmount, setVertAmount] = useState('');
   const [bnbAmount, setBnbAmount] = useState('');
   const [bnbPrice, setBnbPrice] = useState(null);
@@ -55,61 +54,15 @@ const Home = () => {
   const [miningAmount, setMiningAmount] = useState('');
   const [stakedVert, setStakedVert] = useState('0');
   const [rewards, setRewards] = useState('0');
-  const [web3, setWeb3] = useState(null);
-  const [referrer, setReferrer] = useState(null);
+  const [timeRemaining, setTimeRemaining] = useState('');
   const [institutionCode, setInstitutionCode] = useState('');
   const [isDiscountValid, setIsDiscountValid] = useState(false);
-  const [timeRemaining, setTimeRemaining] = useState('');
 
   useEffect(() => {
-    if (window.ethereum) {
-      const web3Instance = new Web3(window.ethereum);
-
-      window.ethereum
-        .request({ method: 'eth_chainId' })
-        .then((chainId) => {
-          const chainIdDecimal = parseInt(chainId, 16);
-          if (chainIdDecimal === 56) {
-            setWeb3(web3Instance);
-
-            // 请求用户账户
-            window.ethereum
-              .request({ method: 'eth_requestAccounts' })
-              .then((accounts) => {
-                if (accounts.length > 0) {
-                  setAccount(accounts[0]);
-                  initializeData(web3Instance, accounts[0]);
-                } else {
-                  alert('Please connect your wallet account.');
-                }
-              })
-              .catch((err) => {
-                console.error('Error fetching accounts:', err);
-              });
-          }
-        })
-        .catch((error) => {
-          console.error('Error fetching Chain ID:', error);
-        });
-
-      // 监听网络变化
-      window.ethereum.on('chainChanged', (chainId) => {
-        window.location.reload();
-      });
-
-      // 监听账户变化
-      window.ethereum.on('accountsChanged', (accounts) => {
-        if (accounts.length > 0) {
-          setAccount(accounts[0]);
-          initializeData(web3Instance, accounts[0]);
-        } else {
-          setAccount(null); // 用户已登出
-        }
-      });
-    } else {
-      alert('Please install MetaMask!');
+    if (account && web3) {
+      initializeData(web3, account);
     }
-  }, []);
+  }, [account, web3]);
 
   const calculateTimeRemaining = () => {
     const endDate = new Date(PRE_SALE_END_DATE);
@@ -118,12 +71,8 @@ const Home = () => {
 
     if (difference > 0) {
       const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-      const hours = Math.floor(
-        (difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-      );
-      const minutes = Math.floor(
-        (difference % (1000 * 60 * 60)) / (1000 * 60)
-      );
+      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((difference % (1000 * 60)) / 1000);
       setTimeRemaining(`${days}d ${hours}h ${minutes}m ${seconds}s`);
     } else {
@@ -150,10 +99,7 @@ const Home = () => {
 
   const fetchBalances = async (account, web3Instance) => {
     try {
-      const vertContract = new web3Instance.eth.Contract(
-        VERT_ABI,
-        VERT_CONTRACT_ADDRESS
-      );
+      const vertContract = new web3Instance.eth.Contract(VERT_ABI, VERT_CONTRACT_ADDRESS);
       const vertBalance = await vertContract.methods.balanceOf(account).call();
       const bnbBalance = await web3Instance.eth.getBalance(account);
       setVertBalance(fromWei(vertBalance, 'ether'));
@@ -162,15 +108,11 @@ const Home = () => {
       console.error('Error fetching balances:', error);
     }
   };
+
   const fetchStakedVert = async (account, web3Instance) => {
     try {
-      const vertContract = new web3Instance.eth.Contract(
-        VERT_ABI,
-        VERT_CONTRACT_ADDRESS
-      );
-      const staked = await vertContract.methods
-        .getStakedBalance(account)
-        .call();
+      const vertContract = new web3Instance.eth.Contract(VERT_ABI, VERT_CONTRACT_ADDRESS);
+      const staked = await vertContract.methods.getStakedBalance(account).call();
       setStakedVert(fromWei(staked, 'ether'));
     } catch (error) {
       console.error('Error fetching staked VERT:', error);
@@ -179,26 +121,14 @@ const Home = () => {
 
   const fetchRewards = async (account, web3Instance) => {
     try {
-      const vertContract = new web3Instance.eth.Contract(
-        VERT_ABI,
-        VERT_CONTRACT_ADDRESS
-      );
-
-      // 获取用户的质押记录
-      const stakeRecords = await vertContract.methods
-        .getStakeRecords(account)
-        .call();
+      const vertContract = new web3Instance.eth.Contract(VERT_ABI, VERT_CONTRACT_ADDRESS);
+      const stakeRecords = await vertContract.methods.getStakeRecords(account).call();
 
       let totalRewards = new BN(0); // 使用 'bn.js' 的 BN
-
-      // 遍历每个质押记录，计算总奖励
       for (let i = 0; i < stakeRecords.length; i++) {
-        const reward = await vertContract.methods
-          .calculateRewards(account, i)
-          .call();
+        const reward = await vertContract.methods.calculateRewards(account, i).call();
         totalRewards = totalRewards.add(new BN(reward));
       }
-
       setRewards(fromWei(totalRewards, 'ether'));
     } catch (error) {
       console.error('Error fetching rewards:', error);
@@ -248,34 +178,6 @@ const Home = () => {
       }
     }
   };
-
-  const handleMiningAmountChange = (e) => {
-    setMiningAmount(e.target.value);
-  };
-
-  const validateInstitutionCode = () => {
-    const validCodes = [
-      process.env.REACT_APP_DISCOUNT_CODE_1,
-      process.env.REACT_APP_DISCOUNT_CODE_2,
-      process.env.REACT_APP_DISCOUNT_CODE_3,
-      process.env.REACT_APP_DISCOUNT_CODE_4,
-      process.env.REACT_APP_DISCOUNT_CODE_5,
-      process.env.REACT_APP_DISCOUNT_CODE_6,
-      process.env.REACT_APP_DISCOUNT_CODE_7,
-      process.env.REACT_APP_DISCOUNT_CODE_8,
-      process.env.REACT_APP_DISCOUNT_CODE_9,
-      process.env.REACT_APP_DISCOUNT_CODE_10,
-    ];
-
-    if (validCodes.includes(institutionCode)) {
-      setIsDiscountValid(true);
-      alert('Institution code applied successfully!');
-    } else {
-      setIsDiscountValid(false);
-      alert('Invalid institution code.');
-    }
-  };
-
   const handlePurchase = async () => {
     if (web3 && account && vertAmount && bnbAmount) {
       if (parseFloat(vertAmount) < MIN_VERT_AMOUNT) {
@@ -287,24 +189,12 @@ const Home = () => {
         return;
       }
       try {
-        const vertContract = new web3.eth.Contract(
-          VERT_ABI,
-          VERT_CONTRACT_ADDRESS
-        );
-        if (referrer) {
-          await vertContract.methods
-            .setReferrer(referrer)
-            .send({ from: account });
-        }
+        const vertContract = new web3.eth.Contract(VERT_ABI, VERT_CONTRACT_ADDRESS);
         await web3.eth.sendTransaction({
           from: account,
           to: MINING_ADDRESS,
           value: toWei(bnbAmount, 'ether'),
         });
-        const vertAmountInWei = toWei(vertAmount, 'ether');
-        await vertContract.methods
-          .transfer(account, vertAmountInWei)
-          .send({ from: MINING_ADDRESS });
         alert('Purchase successful!');
         fetchBalances(account, web3);
       } catch (error) {
@@ -312,11 +202,34 @@ const Home = () => {
         alert(`There was an issue with your purchase: ${error.message}`);
       }
     } else {
-      alert(
-        'Please make sure your wallet is connected and you have entered a valid amount.'
-      );
+      alert('Please make sure your wallet is connected and you have entered a valid amount.');
     }
   };
+
+  const validateInstitutionCode = () => {
+    const validCodes = [
+      process.env.REACT_APP_DISCOUNT_CODE_1,
+      process.env.REACT_APP_DISCOUNT_CODE_2,
+      process.env.REACT_APP_DISCOUNT_CODE_3,
+	  process.env.REACT_APP_DISCOUNT_CODE_4,
+	  process.env.REACT_APP_DISCOUNT_CODE_5,
+	  process.env.REACT_APP_DISCOUNT_CODE_6,
+	  process.env.REACT_APP_DISCOUNT_CODE_7,
+	  process.env.REACT_APP_DISCOUNT_CODE_8,
+	  process.env.REACT_APP_DISCOUNT_CODE_9,
+	  process.env.REACT_APP_DISCOUNT_CODE_10,
+      // 更多折扣码...
+    ];
+
+    if (validCodes.includes(institutionCode)) {
+      setIsDiscountValid(true);
+      alert('Institution code applied successfully!');
+    } else {
+      setIsDiscountValid(false);
+      alert('Invalid institution code.');
+    }
+  };
+
   const handleStake = async () => {
     if (web3 && account && miningAmount) {
       if (parseFloat(vertBalance) < parseFloat(miningAmount)) {
@@ -324,10 +237,7 @@ const Home = () => {
         return;
       }
       try {
-        const vertContract = new web3.eth.Contract(
-          VERT_ABI,
-          VERT_CONTRACT_ADDRESS
-        );
+        const vertContract = new web3.eth.Contract(VERT_ABI, VERT_CONTRACT_ADDRESS);
         const miningAmountInWei = toWei(miningAmount, 'ether');
 
         // 批准合约从您的账户中花费 VERT 代币
@@ -335,9 +245,7 @@ const Home = () => {
           .approve(VERT_CONTRACT_ADDRESS, miningAmountInWei)
           .send({ from: account });
 
-        await vertContract.methods
-          .stakeTokens(miningAmountInWei)
-          .send({ from: account });
+        await vertContract.methods.stakeTokens(miningAmountInWei).send({ from: account });
         alert('Staking successful!');
         fetchBalances(account, web3);
         fetchStakedVert(account, web3);
@@ -347,9 +255,7 @@ const Home = () => {
         alert(`There was an issue with your staking: ${error.message}`);
       }
     } else {
-      alert(
-        'Please make sure your wallet is connected and you have entered a valid amount.'
-      );
+      alert('Please make sure your wallet is connected and you have entered a valid amount.');
     }
   };
 
@@ -360,15 +266,10 @@ const Home = () => {
         return;
       }
       try {
-        const vertContract = new web3.eth.Contract(
-          VERT_ABI,
-          VERT_CONTRACT_ADDRESS
-        );
+        const vertContract = new web3.eth.Contract(VERT_ABI, VERT_CONTRACT_ADDRESS);
 
         // 获取用户的质押记录
-        const stakeRecords = await vertContract.methods
-          .getStakeRecords(account)
-          .call();
+        const stakeRecords = await vertContract.methods.getStakeRecords(account).call();
 
         if (stakeRecords.length === 0) {
           alert('You have not staked any VERT tokens.');
@@ -377,9 +278,7 @@ const Home = () => {
 
         // 遍历质押记录，领取奖励
         for (let i = 0; i < stakeRecords.length; i++) {
-          await vertContract.methods
-            .distributeDailyRewards(account)
-            .send({ from: account });
+          await vertContract.methods.distributeDailyRewards(account).send({ from: account });
         }
 
         alert('Rewards claimed successfully!');
@@ -403,9 +302,7 @@ const Home = () => {
       </div>
       <h2>VERT Token Pre-Sale</h2>
       {bnbPrice ? (
-        <p>
-          Current BNB Price: <strong>{bnbPrice} USDT</strong>
-        </p>
+        <p>Current BNB Price: <strong>{bnbPrice} USDT</strong></p>
       ) : (
         <p>Loading BNB price...</p>
       )}
@@ -433,10 +330,7 @@ const Home = () => {
           onChange={handleVertAmountChange}
           className="vert-input short-input"
         />
-        <button
-          onClick={handlePurchase}
-          className="purchase-button short-button"
-        >
+        <button onClick={handlePurchase} className="purchase-button short-button">
           Buy VERT
         </button>
       </div>
@@ -446,16 +340,10 @@ const Home = () => {
           <strong>{vertAmount}</strong> VERT.
         </p>
       )}
-      <p className="price-info">
-        Pre-sale price: 0.03 USDT, Listing price: 0.1+ USDT
-      </p>
-      <div className="arrow-down">↓</div>
+	  <div className="arrow-down">↓</div>
       <div className="mining-section">
         <h2>VERT Mining</h2>
-        <p>
-          Your VERT Balance:{' '}
-          {vertBalance ? `${vertBalance} VERT` : 'Loading...'}
-        </p>
+        <p>Your VERT Balance: {vertBalance ? `${vertBalance} VERT` : 'Loading...'}</p>
         <p>Your Staked VERT: {stakedVert} VERT</p>
         <p>Your Rewards: {rewards} VERT</p>
         <div className="staking-actions">
@@ -464,18 +352,14 @@ const Home = () => {
             min="0"
             placeholder="Enter VERT amount"
             value={miningAmount}
-            onChange={handleMiningAmountChange}
+            onChange={(e) => setMiningAmount(e.target.value)}
             className="vert-input short-input"
           />
           <button onClick={handleStake} className="stake-button short-button">
             Stake VERT
           </button>
         </div>
-        <button
-          onClick={handleClaimRewards}
-          className="claim-button"
-          disabled={parseFloat(rewards) === 0}
-        >
+        <button onClick={handleClaimRewards} className="claim-button" disabled={parseFloat(rewards) === 0}>
           Claim Rewards
         </button>
         <p className="expected-income">Expected mining income: 30%</p>
