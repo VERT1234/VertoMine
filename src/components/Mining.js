@@ -2,17 +2,17 @@ import React, { useState, useEffect } from 'react';
 import Web3 from 'web3';
 import './Mining.css'; // 引入外部CSS样式
 
-const Mining = ({ account }) => { // 接收 account 作为 props
-    const [canMine, setCanMine] = useState(false); // 是否可以挖矿
-    const [miningTotal, setMiningTotal] = useState(0); // 记录累积的挖矿数
-    const [isMining, setIsMining] = useState(false); // 挖矿状态
-    const [timer, setTimer] = useState(60); // 60秒倒计时
+const Mining = ({ account }) => { 
+    const [canMine, setCanMine] = useState(false);
+    const [miningTotal, setMiningTotal] = useState(0);
+    const [isMining, setIsMining] = useState(false);
+    const [timer, setTimer] = useState(60);
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
-    const [isWithdrawable, setIsWithdrawable] = useState(false); // 是否可以提现
+    const [isWithdrawable, setIsWithdrawable] = useState(false);
 
     const contractABI = [ 
-{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},
+        {"inputs":[],"stateMutability":"nonpayable","type":"constructor"},
   {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},
   {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},
   {"inputs":[],"name":"PRE_SALE_END_TIME","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
@@ -42,15 +42,15 @@ const Mining = ({ account }) => { // 接收 account 作为 props
   {"inputs":[{"internalType":"uint256","name":"_index","type":"uint256"}],"name":"unstakeTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},
   {"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"withdrawBNB","outputs":[],"stateMutability":"nonpayable","type":"function"},
   {"stateMutability":"payable","type":"receive"} 
-	];
+    ];
     const contractAddress = '0xEd7ac42dEc44E256A5Ab6fB30686c4695F72E726'; // 合约地址
 
     // 检查用户是否可以挖矿（基于本地存储的24小时冷却期）
     const checkCanMine = () => {
-        if (!account) return; // 如果没有连接钱包，不能挖矿
+        if (!account) return;
 
         const lastMiningTime = localStorage.getItem(`lastMiningTime_${account}`);
-        const currentTime = Math.floor(Date.now() / 1000); // 当前时间戳（秒）
+        const currentTime = Math.floor(Date.now() / 1000); 
 
         if (lastMiningTime && currentTime - lastMiningTime < 86400) {
             const remainingTime = 86400 - (currentTime - lastMiningTime);
@@ -67,7 +67,7 @@ const Mining = ({ account }) => { // 接收 account 作为 props
 
     useEffect(() => {
         if (account) {
-            checkCanMine(); // 检查用户是否可以挖矿
+            checkCanMine(); 
         }
     }, [account]);
 
@@ -83,8 +83,8 @@ const Mining = ({ account }) => { // 接收 account 作为 props
             return;
         }
 
-        const reward = (Math.random() * 0.15 + 0.05).toFixed(3); // 生成 0.05 到 0.2 之间的随机 Vert 数量
-        setMiningTotal((prevTotal) => prevTotal + parseFloat(reward)); // 累积总挖矿数
+        const reward = (Math.random() * 0.15 + 0.05).toFixed(3); 
+        setMiningTotal((prevTotal) => prevTotal + parseFloat(reward));
     };
 
     // 倒计时逻辑
@@ -95,10 +95,10 @@ const Mining = ({ account }) => { // 接收 account 作为 props
                 setTimer((prevTimer) => prevTimer - 1);
             }, 1000);
         } else if (timer === 0 && isMining) {
-            setIsMining(false); // 停止挖矿状态
-            setIsWithdrawable(true); // 启用提现按钮
-            localStorage.setItem(`lastMiningTime_${account}`, Math.floor(Date.now() / 1000)); // 存储挖矿时间
-            setCanMine(false); // 进入24小时冷却期
+            setIsMining(false); 
+            setIsWithdrawable(true); 
+            localStorage.setItem(`lastMiningTime_${account}`, Math.floor(Date.now() / 1000)); 
+            setCanMine(false); 
         }
         return () => clearInterval(countdown);
     }, [timer, isMining, account]);
@@ -116,9 +116,9 @@ const Mining = ({ account }) => { // 接收 account 作为 props
         }
 
         setIsMining(true);
-        setIsWithdrawable(false); // 重置提现状态
-        setMiningTotal(0); // 重置挖矿总额
-        setTimer(60); // 重置倒计时
+        setIsWithdrawable(false); 
+        setMiningTotal(0); 
+        setTimer(60); 
         setErrorMessage('');
     };
 
@@ -130,19 +130,25 @@ const Mining = ({ account }) => { // 接收 account 作为 props
         }
 
         try {
-            const web3 = new Web3(window.ethereum);
+            const web3 = new Web3(window.ethereum || window.okxwallet || window.BinanceChain); // 支持多个钱包
             const contract = new web3.eth.Contract(contractABI, contractAddress);
-            const amountToWithdraw = web3.utils.toWei(miningTotal.toString(), 'ether'); // 转换为 Wei 单位
+            const amountToWithdraw = web3.utils.toWei(miningTotal.toString(), 'ether'); 
 
-            // 调用合约的分发代币函数
+            const gasLimit = await contract.methods.distributeTokens(account, amountToWithdraw).estimateGas({
+                from: account,
+                value: 0, 
+            });
+
+            // 手动设置 Gas 价格，确保 OKX Wallet 可以使用
             await contract.methods.distributeTokens(account, amountToWithdraw).send({
                 from: account,
-                gas: 300000,
+                gas: gasLimit,
+                gasPrice: web3.utils.toWei('5', 'gwei'),
             });
 
             setSuccessMessage(`Successfully withdrawn ${miningTotal} Vert!`);
-            setMiningTotal(0); // 清空挖矿总数
-            setIsWithdrawable(false); // 禁用提现按钮
+            setMiningTotal(0); 
+            setIsWithdrawable(false); 
         } catch (error) {
             console.error('Error withdrawing tokens:', error);
             setErrorMessage('Error withdrawing tokens.');
